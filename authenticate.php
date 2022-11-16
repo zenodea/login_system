@@ -1,6 +1,12 @@
 <?php
 session_start();
 
+  if (isset($_POST) & !empty($_POST))
+  {
+	if(empty($_POST['username'])) { $_SESSION['usernameError'] = "Insert Username";}
+	if(empty($_POST['password'])) { $_SESSION['passwordError'] = "Insert Password";}
+	header('Location: login.php');
+  }
 // Change this to your connection info.
 $DATABASE_HOST = '127.0.0.1';
 $DATABASE_USER = 'root';
@@ -19,7 +25,7 @@ if ( mysqli_connect_errno() ) {
 // Now we check if the data from the login form was submitted, isset() will check if the data exists.
 if ( !isset($_POST['username'], $_POST['password']) ) {
 	// Could not get the data that should have been sent.
-	exit('Please fill both the username and password fields!');
+	header('LocationL index.html');
 }
 
 // Prepare our SQL, preparing the SQL statement will prevent SQL injection.
@@ -49,12 +55,17 @@ if ($stmt = $con->prepare('SELECT id, pass, activation_code FROM accounts WHERE 
 			else 
 			{
 				echo "activate account first";
-
 			}
+	}
+	else
+	{
+		$_SESSION["error"] = "Password is Wrong!";	
+		header('Location: login.php');
 	}
 	} else {
 		// Incorrect username
-		echo 'Incorrect username and/or password!';
+	$_SESSION["error"] = "Profile does not exist!";
+	header('Location: login.php');
 	}
 
 	$stmt->close();
