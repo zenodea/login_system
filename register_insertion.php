@@ -1,4 +1,5 @@
 <?php
+session_start();
 
 // Change this to your connection info.
 $DATABASE_HOST = '127.0.0.1';
@@ -16,14 +17,8 @@ $NEW_USERNAME = $_POST['username'];
 $NEW_EMAIL = $_POST['email'];
 $NEW_PASSWORD =  $_POST['password'];
 
+$error = array();
 
-//Check Password is correct
-function function_alert($message) {
-      
-    // Display the alert box 
-    echo "<script>alert('$message');</script>";
-}
-  
 // Validate password strength
 $uppercase = preg_match('@[A-Z]@', $NEW_PASSWORD);
 $lowercase = preg_match('@[a-z]@', $NEW_PASSWORD);
@@ -32,14 +27,39 @@ $specialChars = preg_match('@[^\w]@', $NEW_PASSWORD);
 
 if(!$uppercase || !$lowercase || !$number || !$specialChars || strlen($NEW_PASSWORD) < 8) 
 {
-    header('Location: register.html');
+	if (!$uppercase)
+	{
+		array_push($error,"Password has to contain at least one UpperCase Letter!");
+	}
+	if (!$lowercase)
+	{
+		array_push($error,"Password has to contain at least one LowerCase Letter!");
+	}
+	if (!$number)
+	{
+		array_push($error,"Password has to contain at least one Number Letter!");
+	}
+	if (!$specialChars)
+	{
+		array_push($error,"Password has to contain at least one Special Character!");
+	}
+	if (strlen($NEW_PASSWORD) < 8)
+	{
+		array_push($error,"Password has to longer than 8 characters!");
+	}
+	$_SESSION['error'] = $error;
+    header('Location: register.php');
+	exit();
 }
 
 
 #Check Email is correct
 if (!filter_var($NEW_EMAIL, FILTER_VALIDATE_EMAIL)) 
 {
-	exit('Email is not valid!');
+		array_push($error,"Invalid email!");
+		$_SESSION['error'] = $error;
+		header('Location: register.php');
+		exit();
 }
 
 
@@ -50,12 +70,16 @@ if ($stmt = $con->prepare('SELECT id FROM accounts WHERE username = ?'))
 	$stmt->store_result();
 	if ($stmt -> num_rows > 0)
 	{
-		echo 'Username Exists';
+		array_push($error,"Username alredy taken!");
+		$_SESSION['error'] = $error;
+		header('Location: register.php');
+		exit();
 	}
 	else
 	{
 		// Username doesnt exists, insert new account
-		if ($stmt = $con->prepare('INSERT INTO accounts (username, pass, email, activation_code) VALUES (?, ?, ?, ?)')) {
+		if ($stmt = $con->prepare('INSERT INTO accounts (username, pass, email, activation_code) VALUES (?, ?, ?, ?)')) 
+		{
 			// We do not want to expose passwords in our database, so hash the password and use password_verify when a user logs in.
 			$password = password_hash($NEW_PASSWORD, PASSWORD_DEFAULT);
 			$uniqid = uniqid();
@@ -68,7 +92,16 @@ if ($stmt = $con->prepare('SELECT id FROM accounts WHERE username = ?'))
 			$activate_link = 'http://yourdomain.com/phplogin/activate.php?email=' . $NEW_EMAIL . '&code=' . $uniqid;
 			$message = '<p>Please click the following link to activate your account: <a href="' . $activate_link . '">' . $activate_link . '</a></p>';
 			mail($NEW_EMAIL, $subject, $message, $headers);
-			echo 'Please check your email to activate your account!';		} else {
+			$success = array();
+			array_push($success,'Account Succesfully Created!');
+			array_push($success,'An email has been sent with an activation link.');
+			array_push($success,'please Activate your Account!');
+			$_SESSION['success'] = $success;
+			header('Location: register.php');
+			exit();
+		} 
+		else 
+		{
 			// Something is wrong with the sql statement, check to make sure accounts table exists with all 3 fields.
 			echo 'Could not prepare statement!';
 		}

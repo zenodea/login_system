@@ -1,12 +1,17 @@
 <?php
 session_start();
-
-  if (isset($_POST) & !empty($_POST))
-  {
-	if(empty($_POST['username'])) { $_SESSION['usernameError'] = "Insert Username";}
-	if(empty($_POST['password'])) { $_SESSION['passwordError'] = "Insert Password";}
+$empty = FALSE;
+if (isset($_POST) & !empty($_POST))
+{
+	if(empty($_POST['username'])) { $_SESSION['usernameError'] = "Insert Username";$empty = TRUE; }
+	if(empty($_POST['password'])) { $_SESSION['passwordError'] = "Insert Password"; $empty = TRUE; }
+}
+if ($empty == TRUE)
+{
 	header('Location: login.php');
-  }
+	exit();
+}
+
 // Change this to your connection info.
 $DATABASE_HOST = '127.0.0.1';
 $DATABASE_USER = 'root';
@@ -51,21 +56,26 @@ if ($stmt = $con->prepare('SELECT id, pass, activation_code FROM accounts WHERE 
 				$_SESSION['name'] = $_POST['username'];
 				$_SESSION['id'] = $id;
 				header('Location: profile.php');
+				exit();
 			} 
 			else 
 			{
-				echo "activate account first";
+			$_SESSION["error"] = "Activate Account First!";	
+			header('Location: login.php');
+			exit();
 			}
 	}
 	else
 	{
 		$_SESSION["error"] = "Password is Wrong!";	
 		header('Location: login.php');
+		exit();
 	}
 	} else {
 		// Incorrect username
 	$_SESSION["error"] = "Profile does not exist!";
 	header('Location: login.php');
+	exit();
 	}
 
 	$stmt->close();

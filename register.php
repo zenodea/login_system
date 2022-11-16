@@ -1,5 +1,6 @@
 <?php
   session_start(); // must be before any output
+
   if(isset($_POST) & !empty($_POST))
   {
 	if(isset($_POST['csrf_token']))
@@ -41,12 +42,31 @@
 		<meta charset="utf-8">
 		<title>Register</title>
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 		<link href="style.css" rel="stylesheet" type="text/css">
 	</head>
 	<body>
 		<div class="login">
 			<h1>Register</h1>
-			<form action="register.php" method="POST" autocomplete="off">
+			<?php
+			if (isset($_SESSION["error"]) & !empty($_SESSION["error"])) 
+			{
+				foreach($_SESSION['error'] as $key => $value)
+				{
+				echo "<p class='alert alert-danger'>". $value . "</p>"; 
+				}
+			}
+			$_SESSION['error'] = NULL;
+			if (isset($_SESSION['success']) & !empty($_SESSION['success']))
+			{
+				foreach($_SESSION['success'] as $key => $value)
+				{
+				echo "<p class='alert alert-success'>". $value . "</p>"; 
+				}
+			}
+			$_SESSION['success'] = NULL;
+			?>
+			<form action="register_insertion.php" method="POST" autocomplete="off">
 			<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
 				<label for="username">
 					<i class="fas fa-user"></i>
