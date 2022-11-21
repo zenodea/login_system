@@ -13,7 +13,7 @@
 			$errors[] = "Issues With Token";
 		}
 	}
-	$maximum_time = 5;
+	$maximum_time = 30;
 	if (isset($_SESSION['csrf_token_time']))
 	{
 		$token_time = $_SESSION['csrf_token_time'];

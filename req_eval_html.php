@@ -44,6 +44,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 		<style>
 			form {
 			display: flex;
@@ -99,6 +100,10 @@
 	</nav>
 <body class="loggedin">
 <div>
+<?php 
+if (isset($_SESSION['correct']) & !empty($_SESSION['correct'])){echo "<p class='alert alert-success'>". $_SESSION['passwordError'] . " </p>"; $_SESSION['passwordError'] = NULL;}
+if (isset($_SESSION["error"]) & !empty($_SESSION["error"])) {echo "<p class='alert alert-danger'>". $_SESSION["error"] . " </p>"; $_SESSION['error'] = NULL;}
+?>
 <form action="req_eval.php" method="POST" class="signup-form" enctype="multipart/form-data">
 <input type="hidden" name="csrf_token" value="<?php echo $token;?>">
   <label for="topic">Topic</label><br><br>

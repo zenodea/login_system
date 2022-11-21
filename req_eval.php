@@ -19,12 +19,25 @@ if ( mysqli_connect_errno() ) {
 	// If there is an error with the connection, stop the script and display the error.
 	exit('Failed to connect to MySQL: ' . mysqli_connect_error());
 }
+$allowed = array('png', 'jpg');
+$filename = $_FILES['userfile']['name'];
+$ext = pathinfo($filename, PATHINFO_EXTENSION);
+if (!in_array($ext, $allowed)) {
+	$_SESSION['error'] = "Wrong File Format (Please use png or jpg)!";
+	header('Location: req_eval_html.php');
+	exit();
+}
 $uploaddir = 'imageFolder/';
 $uploadfile = $uploaddir . basename($_FILES['userfile']['name']);
 if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
-	echo "File is valid, and was successfully uploaded.\n";
-  } else {
-	 echo "Upload failed";
+	$_SESSION['correct'] = "Successfully uploaded.\n";
+	header('Location: req_eval_html.php');
+	exit();
+  }
+ else {
+	$_SESSION['error'] = "Upload failed, please try again!";
+	header('Location: req_eval_html.php');
+	exit();
   }
 $id = $_SESSION['id'];
 $header = $_POST['topic'];
