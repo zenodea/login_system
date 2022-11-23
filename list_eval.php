@@ -31,7 +31,7 @@ if ($stmt = $con->prepare('SELECT admin FROM accounts WHERE id = ?'))
 	}
 	else
 	{
-		$query = "SELECT id_user, header, comment, url FROM evaluations";
+		$query = "SELECT id, id_user, header, comment, url FROM evaluations";
 		$result = $con->query($query);
 	}
 }
@@ -46,7 +46,7 @@ if ($stmt = $con->prepare('SELECT admin FROM accounts WHERE id = ?'))
 		<meta charset="utf-8">
 		<title>Profile Page</title>
 		<link href="style.css" rel="stylesheet" type="text/css">
-		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 		<style>
 select{
     text-align-last:right;
@@ -113,6 +113,10 @@ select{
 				<a href="logout.php"><i class="fas fa-sign-out-alt"></i>Logout</a>
 			</div>
 		</nav>
+	<?php 
+	if (isset($_SESSION['correct']) & !empty($_SESSION['correct'])){echo "<p class='alert alert-success'>". $_SESSION['correct'] . " </p>"; $_SESSION['correct'] = NULL;}
+	if (isset($_SESSION["error"]) & !empty($_SESSION["error"])) {echo "<p class='alert alert-danger'>". $_SESSION["error"] . " </p>"; $_SESSION['error'] = NULL;}
+	?>
 	<body class="loggedin">
 		<div class="content">
 			<h2>List of Evaluations</h2>
@@ -127,14 +131,17 @@ select{
 					<th>Resolved</th>
 					<th>Remove</th>
   				</tr>
-                <?php foreach ($result as $key => $row): array_map('htmlentities', $row); ?>
+                <?php foreach ($result as $row): array_map('htmlentities', $row); ?>
                 <tr>
-                <td><?php echo implode('</td><td>', $row); ?></td>
-				<td> <form action="index.html">
+                <td><?php echo $row['id_user'];?></td>
+                <td><?php echo $row['header'];?></td>
+                <td><?php echo $row['comment'];?></td>
+                <td><img src=<?php echo $row['url'];?>></td>
+				<td> 
 			<select id="list" value="Contact">
 				<?php
 					// Get all the categories from category table
-					$sql = "SELECT * FROM `accounts` where id=2";
+					$sql = "SELECT * FROM `accounts` where id=".$row['id_user'];
 					$all_categories = mysqli_query($con,$sql);
 					// use a while loop to fetch data
 					// from the $all_categories variable
@@ -159,8 +166,10 @@ select{
 			<td> 
 			<input type="submit" value="Contact" id="contact"/>
 				<td>
-			<input type="submit" value="Remove" id="remove"/>
-				</form>
+			<form action="remove_eval.php" method="POST">
+				<input type="hidden" name="remove" value=<?php echo $row['id'];?> id="remove" />
+				<input class="button" name="submit_button" value="Remove" type="submit" id="remove"/>
+			</form>
 				</td>
                 </tr>
             <?php endforeach; ?>
