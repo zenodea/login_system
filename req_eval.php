@@ -22,41 +22,47 @@ if ( mysqli_connect_errno() ) {
 	exit('Failed to connect to MySQL: ' . mysqli_connect_error());
 }
 
-//Prepare file upload information
-$allowed = array('png', 'jpg');
-$filename = $_FILES['userfile']['name'];
-$ext = pathinfo($filename, PATHINFO_EXTENSION);
-$uploaddir = "uploads/";
-$uploadfile = $uploaddir . basename($_FILES['userfile']['name']);
+if (!empty($_FILES['userfile']['name'])) {
+	//Prepare file upload information
+	$allowed = array('png', 'jpg');
+	$filename = $_FILES['userfile']['name'];
+	$ext = pathinfo($filename, PATHINFO_EXTENSION);
+	$uploaddir = "uploads/";
+	$uploadfile = $uploaddir . basename($_FILES['userfile']['name']);
 
-//Check file type
-if (!in_array($ext, $allowed)) {
-	$_SESSION['error'] = "Wrong File Format (Please use png or jpg)!";
-	header('Location: req_eval_html.php');
-	exit();
+	//Check file type
+	if (!in_array($ext, $allowed)) {
+		$_SESSION['error'] = "Wrong File Format (Please use png or jpg)!";
+		header('Location: req_eval_html.php');
+		exit();
+	}
+
+	// Check if file already exists
+	if (file_exists($uploadfile)) {
+		$_SESSION['error'] = "File already exists!";
+		header('Location: req_eval_html.php');
+		exit();
+	}
+
+	// Check file size
+	if ($_FILES["userfile"]["size"] > 500000) {
+		$_SESSION['error'] = "Upload failed, file size to large!";
+		header('Location: req_eval_html.php');
+		exit();
+	}
+	if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
+		$_SESSION['correct'] = "The file ". htmlspecialchars(basename( $_FILES["usefile"]["name"])). " has been uploaded.";
+	}
+	else {
+		$_SESSION['error'] = $_FILES['userfile']['tmp_name'];
+		header('Location: req_eval_html.php');
+		exit();
+	}
 }
-
-// Check if file already exists
-if (file_exists($uploadfile)) {
-	$_SESSION['error'] = "File already exists!";
-	header('Location: req_eval_html.php');
-	exit();
-  }
-
-  // Check file size
-if ($_FILES["userfile"]["size"] > 500000) {
-	$_SESSION['error'] = "Upload failed, file size to large!";
-	header('Location: req_eval_html.php');
-	exit();
-  }
-if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
-	$_SESSION['correct'] = "The file ". htmlspecialchars(basename( $_FILES["usefile"]["name"])). " has been uploaded.";
-  }
- else {
-	$_SESSION['error'] = $_FILES['userfile']['tmp_name'];
-	header('Location: req_eval_html.php');
-	exit();
-  }
+else
+{
+	$uploadfile = "None";
+}
 $id = $_SESSION['id'];
 $header = $_POST['topic'];
 $body = $_POST['body'];

@@ -136,8 +136,22 @@ select{
                 <td><?php echo $row['id_user'];?></td>
                 <td><?php echo $row['header'];?></td>
                 <td><?php echo $row['comment'];?></td>
-                <td><img src=<?php echo $row['url'];?>></td>
-				<td> 
+				<?php 
+					if ($row['url'] == "None")
+					{
+						?>
+						<td><?php echo "None";?></td>
+						<td> 
+						<?php
+					}
+					else
+					{
+						?>
+					<td><img src=<?php echo $row['url'];?>></td>
+						<td> 
+						<?php
+					}
+					?>
 			<select id="list" value="Contact">
 				<?php
 					// Get all the categories from category table

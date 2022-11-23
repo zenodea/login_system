@@ -78,12 +78,13 @@ if ($stmt = $con->prepare('SELECT id FROM accounts WHERE username = ?'))
 	else
 	{
 		// Username doesnt exists, insert new account
-		if ($stmt = $con->prepare('INSERT INTO accounts (username, pass, email, activation_code) VALUES (?, ?, ?, ?)')) 
+		if ($stmt = $con->prepare('INSERT INTO accounts (username, pass, email, admin, activation_code) VALUES (?, ?, ?, ?, ?)')) 
 		{
 			// We do not want to expose passwords in our database, so hash the password and use password_verify when a user logs in.
+			$admin = 0;
 			$password = password_hash($NEW_PASSWORD, PASSWORD_DEFAULT);
 			$uniqid = uniqid();
-			$stmt->bind_param('ssss', $NEW_USERNAME, $password, $NEW_EMAIL, $uniqid);
+			$stmt->bind_param('sssis', $NEW_USERNAME, $password, $NEW_EMAIL, $admin, $uniqid);
 			$stmt->execute();
 			$from    = 'noreply@yourdomain.com';
 			$subject = 'Account Activation Required';
