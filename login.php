@@ -1,5 +1,13 @@
 <?php
   session_start(); // must be before any output
+  if (!isset($_SESSION['counter']))
+  {
+	$_SESSION['counter'] = 0;
+  }
+  else
+  {
+  }
+
   if(isset($_POST) & !empty($_POST))
   {
 	if(isset($_POST['csrf_token']))
