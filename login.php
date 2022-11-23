@@ -4,9 +4,6 @@
   {
 	$_SESSION['counter'] = 0;
   }
-  else
-  {
-  }
 
   if(isset($_POST) & !empty($_POST))
   {
