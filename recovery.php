@@ -47,11 +47,6 @@
 			<h1>Recovery</h1>
 			<form action="authenticate.php" method="POST" class="signup-form">
 			<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
-				<?php
-				require_once('recaptchalib.php');
-				$publickey = "your_public_key"; // you got this from the signup page
-				echo recaptcha_get_html($publickey);
-			   ?>
                 <label for="Username">
                     <i class="fas fa-user"></i>
                 </label>
