@@ -66,9 +66,10 @@ else
 $id = $_SESSION['id'];
 $header = $_POST['topic'];
 $body = $_POST['body'];
+$contact = $_POST['contact'];
 
-if ($stmt = $con->prepare("INSERT INTO evaluations (id_user, header, comment, url) VALUES (?, ?, ?, ?)")) {
-		$stmt->bind_param('ssss', $id, $header, $body, $uploadfile);
+if ($stmt = $con->prepare("INSERT INTO evaluations (id_user, header, comment, url, contact) VALUES (?, ?, ?, ?, ?)")) {
+		$stmt->bind_param('sssss', $id, $header, $body, $uploadfile, $contact);
 		$stmt->execute();
 	} 
 header('Location: req_eval_html.php');

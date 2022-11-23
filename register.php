@@ -76,6 +76,10 @@
 					<i class="fas fa-envelope"></i>
 				</label>
 				<input type="text" name="email" placeholder="email" id="email" required>
+				<label for="phone">
+					<i class="fas fa-phone"></i>
+				</label>
+				<input type="text" name="phone" placeholder="Phone" id="phone" required>
 				<label for="password">
 					<i class="fas fa-lock"></i>
 				</label>

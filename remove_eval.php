@@ -26,7 +26,7 @@ if ($stmt = $con->prepare('SELECT url FROM evaluations WHERE id = ?'))
     $stmt->bind_result($result); 
     $stmt->fetch();
     $stmt->close();
-    if (!unlink($result))
+    if (!unlink($result) & $result != "None")
     {
         $_SESSION['error'] = "Resolve Error, image file does not exist!";
         header('Location: list_eval.php');

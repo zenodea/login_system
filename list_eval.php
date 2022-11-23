@@ -31,7 +31,7 @@ if ($stmt = $con->prepare('SELECT admin FROM accounts WHERE id = ?'))
 	}
 	else
 	{
-		$query = "SELECT id, id_user, header, comment, url FROM evaluations";
+		$query = "SELECT id, id_user, header, comment, url, contact FROM evaluations";
 		$result = $con->query($query);
 	}
 }
@@ -129,7 +129,6 @@ select{
 					<th>Image</th>
 					<th>Contact</th>
 					<th>Resolved</th>
-					<th>Remove</th>
   				</tr>
                 <?php foreach ($result as $row): array_map('htmlentities', $row); ?>
                 <tr>
@@ -152,34 +151,9 @@ select{
 						<?php
 					}
 					?>
-			<select id="list" value="Contact">
-				<?php
-					// Get all the categories from category table
-					$sql = "SELECT * FROM `accounts` where id=".$row['id_user'];
-					$all_categories = mysqli_query($con,$sql);
-					// use a while loop to fetch data
-					// from the $all_categories variable
-					// and individually display as an option
-					$category = mysqli_fetch_array($all_categories,MYSQLI_ASSOC);
-				?>
-                <option value="<?php echo $category["id"];
-                    // The value we usually set is the primary key
-                ?>">
-                    <?php echo $category["email"];
-                        // To show the category name to the user
-                    ?>
-                </option>
-                <option value="<?php echo $category["id"];
-                    // The value we usually set is the primary key
-                ?>">
-                    <?php echo $category["username"];
-                        // To show the category name to the user
-                    ?>
-                </option>
-			</select>
-			<td> 
-			<input type="submit" value="Contact" id="contact"/>
-				<td>
+				<input type="submit" value=<?php echo $row['contact'];?> id="contact"/>
+					<td>
+			</form>
 			<form action="remove_eval.php" method="POST">
 				<input type="hidden" name="remove" value=<?php echo $row['id'];?> id="remove" />
 				<input class="button" name="submit_button" value="Remove" type="submit" id="remove"/>

@@ -1,4 +1,6 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors',1);
 session_start();
 
 // Change this to your connection info.
@@ -16,6 +18,7 @@ if ( mysqli_connect_errno() ) {
 $NEW_USERNAME = $_POST['username'];
 $NEW_EMAIL = $_POST['email'];
 $NEW_PASSWORD =  $_POST['password'];
+$NEW_PHONE = $_POST['phone'];
 
 $error = array();
 
@@ -78,13 +81,13 @@ if ($stmt = $con->prepare('SELECT id FROM accounts WHERE username = ?'))
 	else
 	{
 		// Username doesnt exists, insert new account
-		if ($stmt = $con->prepare('INSERT INTO accounts (username, pass, email, admin, activation_code) VALUES (?, ?, ?, ?, ?)')) 
+		if ($stmt = $con->prepare('INSERT INTO accounts (username, pass, email, phone_no, admin, activation_code) VALUES (?, ?, ?, ?, ?, ?)')) 
 		{
 			// We do not want to expose passwords in our database, so hash the password and use password_verify when a user logs in.
 			$admin = 0;
 			$password = password_hash($NEW_PASSWORD, PASSWORD_DEFAULT);
 			$uniqid = uniqid();
-			$stmt->bind_param('sssis', $NEW_USERNAME, $password, $NEW_EMAIL, $admin, $uniqid);
+			$stmt->bind_param('ssssis', $NEW_USERNAME, $password, $NEW_EMAIL, $NEW_PHONE, $admin, $uniqid);
 			$stmt->execute();
 			$from    = 'noreply@yourdomain.com';
 			$subject = 'Account Activation Required';
