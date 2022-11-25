@@ -1,35 +1,6 @@
 <?php
   session_start(); // must be before any output
-
-  if(isset($_POST) & !empty($_POST))
-  {
-	if(isset($_POST['csrf_token']))
-	{
-		if($_POST['csrf_token'] == $_SESSION['csrf_token'])
-		{
-			echo"token recognized";
-		}
-		else
-		{
-			$errors[] = "Issues With Token";
-		}
-	}
-	$maximum_time = 5;
-	if (isset($_SESSION['csrf_token_time']))
-	{
-		$token_time = $_SESSION['csrf_token_time'];
-		if(($token_time + $maximum_time) >= time())
-		{
-			unset($_SESSION['csrf_token_time']);
-			unset($_SESSION['csrf_token']);
-			$errors[] = 'token expired';
-		}
-		else
-		{
-			echo  "all good";
-		}
-	}
-  }
+  
   $token = md5(uniqid(rand(), true));
   $_SESSION['csrf_token'] = $token;
   $_SESSION['csrf_token_time'] = time();

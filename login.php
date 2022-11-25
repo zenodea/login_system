@@ -5,35 +5,6 @@
 	$_SESSION['counter'] = 0;
   }
 
-  if(isset($_POST) & !empty($_POST))
-  {
-	if(isset($_POST['csrf_token']))
-	{
-		if($_POST['csrf_token'] == $_SESSION['csrf_token'])
-		{
-			echo"token recognized";
-		}
-		else
-		{
-			$errors[] = "Issues With Token";
-		}
-	}
-	$maximum_time = 30;
-	if (isset($_SESSION['csrf_token_time']))
-	{
-		$token_time = $_SESSION['csrf_token_time'];
-		if(($token_time + $maximum_time) >= time())
-		{
-			unset($_SESSION['csrf_token_time']);
-			unset($_SESSION['csrf_token']);
-			echo 'token expired';
-		}
-		else
-		{
-			$errors[] =  "all good";
-		}
-	}
-  }
   $token =  bin2hex(random_bytes(32));
   $_SESSION['csrf_token'] = $token;
   $_SESSION['csrf_token_time'] = time();

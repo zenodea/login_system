@@ -8,6 +8,39 @@ $_SESSION['phone'] = $_POST['phone'];
 
 $error = array();
 
+
+//csrf token check (and time check)
+if(isset($_POST) & !empty($_POST))
+{
+	if(isset($_POST['csrf_token']))
+	{
+		if($_POST['csrf_token'] == $_SESSION['csrf_token'])
+		{
+		}
+		else
+		{
+			$_SESSION['error'] = 'Token Error, try again!';
+			session_unset();
+			header('Location: register.php');
+			exit();
+		}
+	}
+	$maximum_time = 600;
+	if (isset($_SESSION['csrf_token_time']))
+	{
+		$token_time = $_SESSION['csrf_token_time'];
+		if(($token_time + $maximum_time) <= time())
+		{
+			unset($_SESSION['csrf_token_time']);
+			unset($_SESSION['csrf_token']);
+			$_SESSION['error'] = 'Token Expired, try again!';
+			session_unset();
+			header('Location: register.php');
+			exit();
+		}
+	}
+}
+
 // Validate password strength
 $uppercase = preg_match('@[A-Z]@', $_SESSION['password']);
 $lowercase = preg_match('@[a-z]@', $_SESSION['password']);
