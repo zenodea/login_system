@@ -12,7 +12,39 @@ if (isset($_POST) & !empty($_POST))
 if ($empty == TRUE)
 {
 	header('Location: login.php');
+	session_unset();
 	exit();
+}
+
+//csrf token check (and time check)
+if(isset($_POST) & !empty($_POST))
+{
+	if(isset($_POST['csrf_token']))
+	{
+		if($_POST['csrf_token'] == $_SESSION['csrf_token'])
+		{
+		}
+		else
+		{
+			$_SESSION['error'] = 'Token Error, try again!';
+			session_unset();
+			header('Location: login.php');
+			exit();
+		}
+	}
+	$maximum_time = 600;
+	if (isset($_SESSION['csrf_token_time']) & !empty($_SESSION['csrf_token_time']))
+	{
+		$token_time = $_SESSION['csrf_token_time'];
+		if(($token_time + $maximum_time) <= time())
+		{
+			unset($_SESSION['csrf_token_time']);
+			unset($_SESSION['csrf_token']);
+			$_SESSION['error'] = 'Token Expired, try again!';
+			header('Location: login.php');
+			exit();
+		}
+	}
 }
 
 // Change this to your connection info.
@@ -30,6 +62,7 @@ if ( mysqli_connect_errno() ) {
 	exit('Failed to connect to MySQL: ' . mysqli_connect_error());
 }
 
+//Check if three attempts have been made
 if ($stmt = $con->prepare('SELECT * FROM ip WHERE address = ?'))
 	{
 		$stmt->bind_param('s', $_SERVER["REMOTE_ADDR"]);
