@@ -33,7 +33,7 @@ use RobThree\Auth\TwoFactorAuth;
                     });
 
                     // substitute your company or app name here
-                    $tfa = new RobThree\Auth\TwoFactorAuth('Lovejoy');
+                    $tfa = new RobThree\Auth\TwoFactorAuth('Lovejoy 2FA');
                 ?>
                 <?php
                     $secret = $tfa->createSecret();
@@ -59,7 +59,11 @@ use RobThree\Auth\TwoFactorAuth;
                 </li>
             <form action="twofactorauth.php" method="POST">
                 <input type=hidden value=<?php echo $secret;?> name="secret" />
-                <input type="submit" value="Complete (Make sure the app is connected before continuing)!" />
+                <input type="submit" value="Complete (Make sure the app is connected before continuing)" />
+            </form>
+            <br>
+            <form action="profile.php" method="POST">
+                <input type="submit" value="Go Back" />
             </form>
         </div>
     </div>
