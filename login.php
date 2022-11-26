@@ -37,7 +37,7 @@
 					<i class="fas fa-lock"></i>
 				</label>
 				<input type="password" name="password" placeholder="Password" id="password">
-				<input type="submit" value="Login" class="btn btn-lg btn-success btn-failure">
+				<input type="submit" value="Login" >
 			</form>
 		<form action="register.php">
 		<input type="hidden" name="csrf_token" value="<?php echo $token;?>">

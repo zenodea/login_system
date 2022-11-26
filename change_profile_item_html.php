@@ -31,6 +31,10 @@ if ($stmt = $con->prepare('SELECT id_one, id_two, id_three FROM security_questio
 	$stmt->bind_result($one, $two, $three);
 	$stmt->fetch();
 }
+
+$token =  bin2hex(random_bytes(32));
+$_SESSION['csrf_token'] = $token;
+$_SESSION['csrf_token_time'] = time();
 ?>
 
 <!DOCTYPE html>
@@ -93,6 +97,7 @@ if ($stmt = $con->prepare('SELECT id_one, id_two, id_three FROM security_questio
 		</nav>
 		<div class="content">
             <?php
+            if (isset($_SESSION['correct']) & !empty($_SESSION['correct'])){echo "<p class='alert alert-success'>". $_SESSION['correct'] . " </p>"; $_SESSION['correct'] = NULL;}
 			if (isset($_SESSION["error"]) & !empty($_SESSION["error"])) {echo "<p class='alert alert-danger'>". $_SESSION["error"] . " </p>"; $_SESSION['error'] = NULL;}
 			?>
 			<h2>Answer Security Questions To Continue</h2>

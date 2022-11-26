@@ -3,6 +3,37 @@ error_reporting(E_ALL);
 ini_set('display_errors',1);
 session_start();
 
+//CSRF token check (and time check)
+if(isset($_POST) & !empty($_POST))
+{
+	if(isset($_POST['csrf_token']))
+	{
+		if($_POST['csrf_token'] == $_SESSION['csrf_token'])
+		{
+		}
+		else
+		{
+			$_SESSION['error'] = 'Token Error, try again!';
+			header('Location: change_value_html.php');
+			exit();
+		}
+	}
+	$maximum_time = 600;
+	if (isset($_SESSION['csrf_token_time']))
+	{
+		$token_time = $_SESSION['csrf_token_time'];
+		if(($token_time + $maximum_time) <= time())
+		{
+			unset($_SESSION['csrf_token_time']);
+			unset($_SESSION['csrf_token']);
+			$_SESSION['error'] = 'Token Expired, try again!';
+			header('Location: change_value_html.php');
+			exit();
+		}
+	}
+}
+
+
 $finalValue = $_POST['newValue'];
 
 if ($_SESSION['change'] == "phone")

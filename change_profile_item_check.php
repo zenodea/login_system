@@ -3,6 +3,38 @@ error_reporting(E_ALL);
 ini_set('display_errors',1);
 session_start();
 
+//CSRF token check (and time check)
+if(isset($_POST) & !empty($_POST))
+{
+	if(isset($_POST['csrf_token']))
+	{
+		if($_POST['csrf_token'] == $_SESSION['csrf_token'])
+		{
+		}
+		else
+		{
+			unset($_SESSION['csrf_token_time']);
+			unset($_SESSION['csrf_token']);
+			$_SESSION['error'] = "CSRF token error, try again!";
+			header('Location: change_profile_item_html.php');
+			exit();
+		}
+	}
+	$maximum_time = 600;
+	if (isset($_SESSION['csrf_token_time']))
+	{
+		$token_time = $_SESSION['csrf_token_time'];
+		if(($token_time + $maximum_time) <= time())
+		{
+			unset($_SESSION['csrf_token_time']);
+			unset($_SESSION['csrf_token']);
+			$_SESSION['error'] = 'Token Expired, try again!';
+			header('Location: change_profile_item_html.php');
+			exit();
+		}
+	}
+}
+
 $question_one =  $_POST['first_answer'];
 $question_two =  $_POST['second_answer'];
 $question_three = $_POST['third_answer'];
