@@ -19,7 +19,7 @@
 - Three distinct security questions are asked and stored (Salted and Hashed).
   - Needed to change informations of the account. (password, email, phone number)
 - Two Factor Authentication can be activated (and deactivated).
-- Captcha added for login page.
+- Captcha added for login page. (Botnet Attack)
 - Number of attempts added.
   - If a user tries to enter into an account more than three times, the ip is stored in database and they will have to wait for 10 minutes.
 - XSS secure.
