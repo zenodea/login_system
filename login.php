@@ -1,4 +1,6 @@
 <?php
+include_once(__DIR__.'/vendor/autoload.php'); 
+use <robthree/twofactorauth>;
   session_start(); // must be before any output
   if (!isset($_SESSION['counter']))
   {
@@ -8,6 +10,8 @@
   $token =  bin2hex(random_bytes(32));
   $_SESSION['csrf_token'] = $token;
   $_SESSION['csrf_token_time'] = time();
+
+
 ?>
 
 <!DOCTYPE html>

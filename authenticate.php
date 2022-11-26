@@ -1,4 +1,8 @@
 <?php
+use RobThree\Auth\TwoFactorAuth;
+
+$tfa = new TwoFactorAuth();
+
 session_start();
 $empty = FALSE;
 
