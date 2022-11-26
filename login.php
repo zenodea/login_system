@@ -43,7 +43,7 @@
 		<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
 			<input type="submit" value="Register" />
 		</form>
-		<form action="recovery.php">
+		<form action="recovery_html.php">
 		<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
 			<input type="submit" value="Forgot Password" />
 		</form>
