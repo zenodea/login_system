@@ -45,6 +45,24 @@
 	<body>
 		<div class="login">
 			<h1>Recovery</h1>
+			<?php
+			if (isset($_SESSION["error"]) & !empty($_SESSION["error"])) 
+			{
+				foreach($_SESSION['error'] as $key => $value)
+				{
+				echo "<p class='alert alert-danger'>". $value . "</p>"; 
+				}
+			}
+			$_SESSION['error'] = NULL;
+			if (isset($_SESSION['success']) & !empty($_SESSION['success']))
+			{
+				foreach($_SESSION['success'] as $key => $value)
+				{
+				echo "<p class='alert alert-success'>". $value . "</p>"; 
+				}
+			}
+			$_SESSION['success'] = NULL;
+			?>
 			<form action="authenticate.php" method="POST" class="signup-form">
 			<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
                 <label for="Username">
