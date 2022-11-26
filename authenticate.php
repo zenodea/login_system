@@ -1,8 +1,4 @@
 <?php
-use RobThree\Auth\TwoFactorAuth;
-
-$tfa = new TwoFactorAuth();
-
 session_start();
 $empty = FALSE;
 
@@ -130,14 +126,30 @@ if ($stmt = $con->prepare('SELECT id, pass, activation_code FROM accounts WHERE 
 		if (password_verify($_POST['password'], $password)) {
 			if ($authentication_code == 'activated')
 			{
-				// Verification success! User has logged-in!
-				// Create sessions, so we know the user is logged in, they basically act like cookies but remember the data on the server.
-				session_regenerate_id();
-				$_SESSION['loggedin'] = TRUE;
-				$_SESSION['name'] = $_POST['username'];
-				$_SESSION['id'] = $id;
-				header('Location: profile.php');
-				exit();
+				if ($stmt = $con->prepare('SELECT * FROM 2fa WHERE id = ?'))
+				{
+					$stmt->bind_param('i', $id);
+					$stmt->execute();
+					$stmt->store_result();
+					if ($stmt->num_rows > 0)
+					{
+						$_SESSION['error'] = "Insert 2FA PIN!";
+						session_regenerate_id();
+						$_SESSION['name'] = $_POST['username'];
+						$_SESSION['id'] = $id;
+						header('Location: login_2fa_html.php');
+						exit();
+					}
+					else
+					{
+						session_regenerate_id();
+    					$_SESSION['loggedin'] = TRUE;
+						$_SESSION['name'] = $_POST['username'];
+						$_SESSION['id'] = $id;
+						header('Location: profile.php');
+						exit();
+					}
+				}
 			} 
 			else 
 			{

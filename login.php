@@ -1,6 +1,4 @@
 <?php
-include_once(__DIR__.'/vendor/autoload.php'); 
-use <robthree/twofactorauth>;
   session_start(); // must be before any output
   if (!isset($_SESSION['counter']))
   {

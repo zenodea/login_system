@@ -33,6 +33,22 @@ else
 {
 	$admin = "True";
 }
+
+if ($stmt = $con->prepare('SELECT id FROM 2fa WHERE id = ?'))
+{
+	// In this case we can use the account ID to get the account info.
+	$stmt->bind_param('i', $_SESSION['id']);
+	$stmt->execute();
+	$stmt->store_result();
+	if ($stmt->num_rows > 0)
+	{
+		$twofact = "Active";
+	}
+	else
+	{
+		$twofact = "Not Active";
+	}
+}
 ?>
 
 <!DOCTYPE html>
@@ -56,6 +72,24 @@ else
 		</nav>
 		<div class="content">
 			<h2>Profile Page</h2>
+			<?php
+			if (isset($_SESSION["error"]) & !empty($_SESSION["error"])) 
+			{
+				foreach($_SESSION['error'] as $key => $value)
+				{
+				echo "<p class='alert alert-danger'>". $value . "</p>"; 
+				}
+			}
+			$_SESSION['error'] = NULL;
+			if (isset($_SESSION['success']) & !empty($_SESSION['success']))
+			{
+				foreach($_SESSION['success'] as $key => $value)
+				{
+				echo "<p class='alert alert-success'>". $value . "</p>"; 
+				}
+			}
+			$_SESSION['success'] = NULL;
+			?>
 			<div>
 				<p>Your account details are below:</p>
 				<table>
@@ -75,7 +109,30 @@ else
 						<td>Admin:</td>
 						<td><?=htmlspecialchars($admin)?></td>
 					</tr>
+					<tr>
+						<td>2 Factor Authentication:</td>
+						<td><?=htmlspecialchars($twofact)?></td>
+					</tr>
 				</table><br>
+			<?php
+			if ($twofact == "Not Active")
+			{
+				?>
+				<form action="twofactorauth_html.php" method="POST">
+				<input type="submit" value="Activate 2FA" />
+				</form>
+				<?php
+			}
+			else
+			{
+				?>
+				<form action="twofactor_deactivate.php" method="POST">
+				<input type="submit" value="Deactivate 2FA" />
+				</form>
+				<?php
+			}
+			?>
+		<br>
 		<form action="change_profile_item_html.php" method="POST">
 			<input type=hidden value="password" name="value" />
 			<input type="submit" value="Change Password" />
