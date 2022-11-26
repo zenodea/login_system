@@ -1,4 +1,5 @@
 <?php
+session_start();
 // Change this to your connection info.
 $DATABASE_HOST = '127.0.0.1';
 $DATABASE_USER = 'root';
@@ -26,10 +27,18 @@ if (isset($_GET['email'], $_GET['code'])) {
 				$newcode = 'activated';
 				$stmt->bind_param('sss', $newcode, $_GET['email'], $_GET['code']);
 				$stmt->execute();
-				echo 'Your account is now activated! You can now <a href="index.html">login</a>!';
+				$success = array();
+				array_push($success, 'Your account is now activated! You can now <a href="index.html">login</a>!');
+				$_SESSION['success'] = $success;
+				header('Location: register.php');
+				exit();
 			}
 		} else {
-			echo 'The account is already activated or doesn\'t exist!';
+			$error = array();
+			array_push($error, 'The account is already activated or doesn\'t exist!');
+			$_SESSION['error'] = $error;
+			header('Location: register.php');
+			exit();
 		}
 	}
 }
