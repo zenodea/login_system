@@ -1,37 +1,8 @@
 <?php
-  session_start(); // must be before any output
-  if(isset($_POST) & !empty($_POST))
-  {
-	if(isset($_POST['csrf_token']))
-	{
-		if($_POST['csrf_token'] == $_SESSION['csrf_token'])
-		{
-			echo"token recognized";
-		}
-		else
-		{
-			$errors[] = "Issues With Token";
-		}
-	}
-	$maximum_time = 5;
-	if (isset($_SESSION['csrf_token_time']))
-	{
-		$token_time = $_SESSION['csrf_token_time'];
-		if(($token_time + $maximum_time) >= time())
-		{
-			unset($_SESSION['csrf_token_time']);
-			unset($_SESSION['csrf_token']);
-			$errors[] = 'token expired';
-		}
-		else
-		{
-			echo  "all good";
-		}
-	}
-  }
-  $token = md5(uniqid(rand(), true));
-  $_SESSION['csrf_token'] = $token;
-  $_SESSION['csrf_token_time'] = time();
+session_start(); // must be before any output
+$token = md5(uniqid(rand(), true));
+$_SESSION['csrf_token'] = $token;
+$_SESSION['csrf_token_time'] = time();
 ?>
 
 <!DOCTYPE html>
@@ -40,6 +11,7 @@
 		<meta charset="utf-8">
 		<title>Recovery pssword</title>
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 		<link href="style.css" rel="stylesheet" type="text/css">
 	</head>
 	<body>
@@ -63,7 +35,7 @@
 			}
 			$_SESSION['success'] = NULL;
 			?>
-			<form action="authenticate.php" method="POST" class="signup-form">
+			<form action="recovery.php" method="POST" class="signup-form">
 			<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
                 <label for="Username">
                     <i class="fas fa-user"></i>

@@ -26,6 +26,14 @@
 			if (isset($_SESSION['usernameError']) & !empty($_SESSION['usernameError'])){echo "<p class='alert alert-danger'>". $_SESSION['usernameError'] . " </p>";$_SESSION['usernameError'] = NULL;}
 			if (isset($_SESSION['passwordError']) & !empty($_SESSION['passwordError'])){echo "<p class='alert alert-danger'>". $_SESSION['passwordError'] . " </p>"; $_SESSION['passwordError'] = NULL;}
 			if (isset($_SESSION["error"]) & !empty($_SESSION["error"])) {echo "<p class='alert alert-danger'>". $_SESSION["error"] . " </p>"; $_SESSION['error'] = NULL;}
+			if (isset($_SESSION['success']) & !empty($_SESSION['success']))
+			{
+				foreach($_SESSION['success'] as $key => $value)
+				{
+				echo "<p class='alert alert-success'>". $value . "</p>"; 
+				}
+			}
+			$_SESSION['success'] = NULL;
 			?>
 		<form  action="authenticate.php"  method="POST" required>
 				<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
