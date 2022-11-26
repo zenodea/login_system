@@ -99,8 +99,11 @@ if ($stmt = $con->prepare('SELECT id FROM accounts WHERE username = ?'))
 			{
 				$result = $con->insert_id;
 				// We do not want to expose passwords in our database, so hash the password and use password_verify when a user logs in.
-				$stmt->bind_param('iisisis', $result, key($question_one), current($question_one), key($question_two), current($question_two),
-								  key($question_three), current($question_three),);
+				$stmt->bind_param('iisisis', $result, 
+								  key($question_one), password_hash(current($question_one), PASSWORD_DEFAULT), 
+								  key($question_two), password_hash(current($question_two), PASSWORD_DEFAULT),
+								  key($question_three), password_hash(current($question_three), PASSWORD_DEFAULT),);
+
 				$stmt->execute();
 				$from    = 'noreply@yourdomain.com';
 				$subject = 'Account Activation Required';

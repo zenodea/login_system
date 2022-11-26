@@ -46,6 +46,8 @@ if ($stmt = $con->prepare('SELECT admin FROM accounts WHERE id = ?'))
 		<meta charset="utf-8">
 		<title>Profile Page</title>
 		<link href="style.css" rel="stylesheet" type="text/css">
+		
+		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 		<style>
 select{
@@ -68,6 +70,14 @@ select{
 			background-color: #90EE90;
 			border: 1;
 			border-color: black;
+	}
+		#see_pic{
+			width: 100%;
+			background-color: #90EE90;
+			border: 0;
+			cursor: pointer;
+			font-weight: bold;
+			transition: background-color 0.2s;
 	}
 		#remove{
 			width: 100%;
@@ -146,14 +156,17 @@ select{
 					else
 					{
 						?>
-					<td><img src=<?php echo $row['url'];?>></td>
+					<form action="show_image.php" method="POST">
+						<input type="hidden" name="description" value=<?php echo $row['header'];?> id="description" hidden>
+						<input type="hidden" name="image" value=<?php echo $row['url'];?> id="image" hidden>
+						<td><input type="submit" value="See Picture" id="see_pic"></td>
+					</form>
 						<td> 
 						<?php
 					}
 					?>
 				<input type="submit" value=<?php echo $row['contact'];?> id="contact"/>
 					<td>
-			</form>
 			<form action="remove_eval.php" method="POST">
 				<input type="hidden" name="remove" value=<?php echo $row['id'];?> id="remove" />
 				<input class="button" name="submit_button" value="Remove" type="submit" id="remove"/>

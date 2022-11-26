@@ -1,29 +1,28 @@
 <?php
-  session_start(); // must be before any output
+session_start(); // must be before any output
 
-	// Change this to your connection info.
-	$DATABASE_HOST = '127.0.0.1';
-	$DATABASE_USER = 'root';
-	$DATABASE_PASS = '';
-	$DATABASE_NAME = 'firstexample';
-
-	$con = mysqli_connect($DATABASE_HOST, $DATABASE_USER, $DATABASE_PASS, $DATABASE_NAME);
-
-	if ( mysqli_connect_errno() ) {
-		// If there is an error with the connection, stop the script and display the error.
-		exit('Failed to connect to MySQL: ' . mysqli_connect_error());
-		echo "yikes";
-	}
-
-  if (!isset($_SESSION['loggedin'])) {
+if (!isset($_SESSION['loggedin'])) {
 	header('Location: index.html');
 	exit;
-
-	session_start(); // must be before any output
-	$token = md5(uniqid(rand(), true));
-	$_SESSION['csrf_token'] = $token;
-	$_SESSION['csrf_token_time'] = time();
 }
+
+// Change this to your connection info.
+$DATABASE_HOST = '127.0.0.1';
+$DATABASE_USER = 'root';
+$DATABASE_PASS = '';
+$DATABASE_NAME = 'firstexample';
+
+$con = mysqli_connect($DATABASE_HOST, $DATABASE_USER, $DATABASE_PASS, $DATABASE_NAME);
+
+if ( mysqli_connect_errno() ) {
+	// If there is an error with the connection, stop the script and display the error.
+	exit('Failed to connect to MySQL: ' . mysqli_connect_error());
+	echo "yikes";
+}
+
+$token = md5(uniqid(rand(), true));
+$_SESSION['csrf_token'] = $token;
+$_SESSION['csrf_token_time'] = time();
 ?>
 
 <!DOCTYPE html>

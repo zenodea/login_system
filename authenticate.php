@@ -9,6 +9,7 @@ if (isset($_POST) & !empty($_POST))
 	if(empty($_POST['username'])) { $_SESSION['usernameError'] = "Insert Username";$empty = TRUE; }
 	if(empty($_POST['password'])) { $_SESSION['passwordError'] = "Insert Password"; $empty = TRUE; }
 }
+
 if ($empty == TRUE)
 {
 	header('Location: login.php');
