@@ -24,29 +24,30 @@ if ($stmt = $con->prepare('SELECT mail FROM accounts WHERE username = ?'))
 	$stmt->close();
 	if ($email == 0)
 	{
-        array_push($error,'please Activate your Account!');
+        array_push($error,'Username does not exist!');
         $_SESSION['error'] = $success;
-        header('Location: register.php');
+        header('Location: recovery_html.php');
         exit();
 	}
-	else
-	{
-		$query = "SELECT id, id_user, header, comment, url, contact FROM evaluations";
-		$result = $con->query($query);
-	}
-    $from    = 'noreply215872@gmail.com';
-    $subject = 'Account Activation Required';
-    $headers = 'From: ' . $from . "\r\n" . 'Reply-To: ' . $from . "\r\n" . 'X-Mailer: PHP/' . phpversion() . "\r\n" . 'MIME-Version: 1.0' . "\r\n" . 'Content-Type: text/html; charset=UTF-8' . "\r\n";
-    // Update the activation variable below
-    $activate_link = 'localhost/ComputerSecurity/activate.php?email=' . $NEW_EMAIL . '&code=' . $uniqid;
-    $message = '<p>Please click the following link to activate your account: <a href="' . $activate_link . '">' . $activate_link . '</a></p>';
-    mail($NEW_EMAIL, $subject, $message, $headers);
-    $success = array();
-    array_push($success,'Account Succesfully Created!');
-    array_push($success,'An email has been sent with an activation link.');
-    array_push($success,'please Activate your Account!');
-    $_SESSION['success'] = $success;
-    header('Location: register.php');
-    exit();
+    if ($stmt = $con->prepare('INSERT INTO recovery_password VALUES ?, ?, ?'))
+    {
+        $uniqid = uniqid();
+        $stmt->bind_param('sss',$_POST['user'], $uniqid, );
+        $stmt->execute();
+	    $stmt->close();
+        $from    = 'noreply215872@gmail.com';
+        $subject = 'Account Recovery Password';
+        $headers = 'From: ' . $from . "\r\n" . 'Reply-To: ' . $from . "\r\n" . 'X-Mailer: PHP/' . phpversion() . "\r\n" . 'MIME-Version: 1.0' . "\r\n" . 'Content-Type: text/html; charset=UTF-8' . "\r\n";
+        // Update the activation variable below
+        $activate_link = 'localhost/ComputerSecurity/activate.php?email=' . $NEW_EMAIL . '&code=' . $uniqid;
+        $message = '<p>Please click the following link to activate your account: <a href="' . $activate_link . '">' . $activate_link . '</a></p>';
+        mail($NEW_EMAIL, $subject, $message, $headers);
+        $success = array();
+        array_push($success,'An email has been sent with a recovery link.');
+        array_push($success,'Remember to use it before it expires! (5 hours)');
+        $_SESSION['success'] = $success;
+        header('Location: recovery_html.php');
+        exit();
+    }
 }
 ?>
