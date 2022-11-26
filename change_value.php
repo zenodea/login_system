@@ -3,6 +3,12 @@ error_reporting(E_ALL);
 ini_set('display_errors',1);
 session_start();
 
+// If the user is not logged in redirect to the login page...
+if (!isset($_SESSION['loggedin'])) {
+	header('Location: index.html');
+	exit;
+}
+
 //CSRF token check (and time check)
 if(isset($_POST) & !empty($_POST))
 {

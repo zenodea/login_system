@@ -5,6 +5,7 @@ if (!isset($_SESSION['loggedin'])) {
 	header('Location: index.html');
 	exit;
 }
+
 // Change this to your connection info.
 $DATABASE_HOST = '127.0.0.1';
 $DATABASE_USER = 'root';

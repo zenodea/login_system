@@ -3,6 +3,13 @@ error_reporting(E_ALL);
 ini_set('display_errors',1);
 session_start();
 
+// If the user is not logged in redirect to the login page...
+if (!isset($_SESSION['loggedin'])) {
+	header('Location: index.html');
+	exit;
+}
+
+
 if ($_SESSION['change'] == "phone")
 {
     $value = "Phone Number";
