@@ -39,7 +39,7 @@ if(isset($_POST) & !empty($_POST))
 $DATABASE_HOST = '127.0.0.1';
 $DATABASE_USER = 'root';
 $DATABASE_PASS = '';
-$DATABASE_NAME = 'firstexample';
+$DATABASE_NAME = 'lovejoy_db';
 
 $error = array();
 
