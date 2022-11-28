@@ -57,7 +57,7 @@ $_SESSION['csrf_token_time'] = time();
 				</label>
 				<input type="password" name="password" placeholder="Password" id="password" required>
 				<br>
-				<div class="g-recaptcha" data-sitekey="6Ldmoj0jAAAAAKYyHaDbjhvncIOSjkFGTxMeT"></div>
+				<div class="g-recaptcha" data-sitekey="6Ldmoj0jAAAAAKYyHaDbjhvncIOSjkFGTxMeT-OG"></div>
 				<input type="submit" value="Register">
 			</form>
 		<form action="login.php">

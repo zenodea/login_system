@@ -26,6 +26,27 @@ $stmt->bind_result($phone, $email, $admin);
 $stmt->fetch();
 $stmt->close();
 
+$password = $_SESSION['password'];
+$key = substr(hash('sha256', $password, true), 0, 32);
+$cipher = 'aes-256-gcm';
+$iv_len = openssl_cipher_iv_length($cipher);
+$tag_length = 16;
+
+
+$textToDecrypt = $phone;
+$encrypted = base64_decode($textToDecrypt);
+$iv = substr($encrypted, 0, $iv_len);
+$ciphertext = substr($encrypted, $iv_len, -$tag_length);
+$tag = substr($encrypted, -$tag_length);
+$phone = openssl_decrypt($ciphertext, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag);
+
+$textToDecrypt = $email;
+$encrypted = base64_decode($textToDecrypt);
+$iv = substr($encrypted, 0, $iv_len);
+$ciphertext = substr($encrypted, $iv_len, -$tag_length);
+$tag = substr($encrypted, -$tag_length);
+$email = openssl_decrypt($ciphertext, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag);
+
 if ($admin == 0)
 {
 	$admin = "False";

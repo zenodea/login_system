@@ -159,6 +159,7 @@ if ($stmt = $con->prepare('SELECT id, pass, activation_code FROM accounts WHERE 
 						session_regenerate_id();
 						$_SESSION['name'] = $_POST['username'];
 						$_SESSION['id'] = $id;
+						$_SESSION['password'] = $_POST['password'];
 						header('Location: login_2fa_html.php');
 						exit();
 					}
@@ -168,6 +169,7 @@ if ($stmt = $con->prepare('SELECT id, pass, activation_code FROM accounts WHERE 
     					$_SESSION['loggedin'] = TRUE;
 						$_SESSION['name'] = $_POST['username'];
 						$_SESSION['id'] = $id;
+						$_SESSION['password'] = $_POST['password'];
 						header('Location: profile.php');
 						exit();
 					}

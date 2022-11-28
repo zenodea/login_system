@@ -20,6 +20,20 @@ if ( mysqli_connect_errno() ) {
 	echo "yikes";
 }
 
+$password = $_SESSION['password'];
+$key = substr(hash('sha256', $password, true), 0, 32);
+$cipher = 'aes-256-gcm';
+$iv_len = openssl_cipher_iv_length($cipher);
+$tag_length = 16;
+
+
+$textToDecrypt = $phone;
+$encrypted = base64_decode($textToDecrypt);
+$iv = substr($encrypted, 0, $iv_len);
+$ciphertext = substr($encrypted, $iv_len, -$tag_length);
+$tag = substr($encrypted, -$tag_length);
+$phone = openssl_decrypt($ciphertext, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag);
+
 $token = md5(uniqid(rand(), true));
 $_SESSION['csrf_token'] = $token;
 $_SESSION['csrf_token_time'] = time();
@@ -135,17 +149,37 @@ if (isset($_SESSION["error"]) & !empty($_SESSION["error"])) {echo "<p class='ale
 			// from the $all_categories variable
 			// and individually display as an option
 			$category = mysqli_fetch_array($all_categories,MYSQLI_ASSOC);
+
+			//Decrypt Phone Number
+			$phone = $category["phone_no"];
+			$encrypted = base64_decode($phone);
+			$iv = substr($encrypted, 0, $iv_len);
+			$ciphertext = substr($encrypted, $iv_len, -$tag_length);
+			$tag = substr($encrypted, -$tag_length);
+			$phone = openssl_decrypt($ciphertext, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag);
+
+			//Decrypt Email 
+			$email = $category["email"];
+			$encrypted = base64_decode($email);
+			$iv = substr($encrypted, 0, $iv_len);
+			$ciphertext = substr($encrypted, $iv_len, -$tag_length);
+			$tag = substr($encrypted, -$tag_length);
+			$email = openssl_decrypt($ciphertext, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag);
 		?>
-		<option value=<?php echo $category["email"];?>>
-			<?php echo "Email: ".$category["email"];?>
+		<option value=<?php echo $email;?>>
+			<?php 
+			echo "Email: ".$email;
+			?>
 		</option>
-		<option value=<?php echo $category["phone_no"];?>>
-			<?php echo "Phone Number: ". $category["phone_no"];?>
+		<option value=<?php echo $phone;?>>
+			<?php 
+			echo "Phone Number: ". $phone;
+			?>
 		</option>
   </select>
   <input type="submit" value="Submit">
   <div class="text-center">
-  <div class="g-recaptcha" data-sitekey="6Ldmoj0jAAAAAKYyHaDbjhvncIOSjkFGTxMeT"></div>
+  <div class="g-recaptcha" data-sitekey="6Ldmoj0jAAAAAKYyHaDbjhvncIOSjkFGTxMeT-OG"></div>
 	</div>
 </form>
  </div>

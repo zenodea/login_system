@@ -3,6 +3,7 @@ error_reporting(E_ALL);
 ini_set('display_errors',1);
 session_start();
 
+
 $error = array();
 
 //CSRF token check (and time check)
@@ -72,6 +73,16 @@ if (array_key_exists(key($question_one), $question_two)
 	exit();
 }
 
+//Prepare Encryption
+$password = $NEW_PASSWORD;
+$key = substr(hash('sha256', $password, true), 0, 32);
+$cipher = 'aes-256-gcm';
+$iv_len = openssl_cipher_iv_length($cipher);
+$tag_length = 16;
+$iv = openssl_random_pseudo_bytes($iv_len);
+$tag = ""; // will be filled by openssl_encrypt
+
+
 if ($stmt = $con->prepare('SELECT id FROM accounts WHERE username = ?')) 
 {
 	$stmt->bind_param('s', $NEW_USERNAME);
@@ -92,8 +103,16 @@ if ($stmt = $con->prepare('SELECT id FROM accounts WHERE username = ?'))
 				// We do not want to expose passwords in our database, so hash the password and use password_verify when a user logs in.
 				$admin = 0;
 				$password = password_hash($NEW_PASSWORD, PASSWORD_DEFAULT);
+
+				$email = openssl_encrypt($NEW_EMAIL, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag, "", $tag_length);
+				$email = base64_encode($iv.$email.$tag);
+
+				$phone = openssl_encrypt($NEW_PHONE, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag, "", $tag_length);
+				$phone = base64_encode($iv.$phone.$tag);
+
 				$uniqid = uniqid();
-				$stmt->bind_param('ssssis', $NEW_USERNAME, $password, $NEW_EMAIL, $NEW_PHONE, $admin, $uniqid);
+
+				$stmt->bind_param('ssssis', $NEW_USERNAME, $password, $email, $phone, $admin, $uniqid);
 				$stmt->execute();
 			if  ($stmt = $con->prepare('INSERT INTO security_questions VALUES (?, ?, ?, ?, ?, ?, ?)'))
 			{
@@ -115,8 +134,7 @@ if ($stmt = $con->prepare('SELECT id FROM accounts WHERE username = ?'))
 				$success = array();
 				array_push($success,'Account Succesfully Created!');
 				array_push($success,'An email has been sent with an activation link.');
-				array_push($success,'please Activate your Account!');
-				$_SESSION['success'] = $success;
+				array_push($success,'please Activate your Account!'); $_SESSION['success'] = $success;
 				header('Location: register.php');
 				exit();
 			}
