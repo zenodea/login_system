@@ -15,6 +15,7 @@ $_SESSION['csrf_token_time'] = time();
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 		<link href="style.css" rel="stylesheet" type="text/css">
+		<script src='https://www.google.com/recaptcha/api.js' async defer></script>
 	</head>
 	<body>
 		<div class="login">
@@ -41,6 +42,7 @@ $_SESSION['csrf_token_time'] = time();
 				<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
 				<label for="Username"> <i class="fas fa-user"></i> </label>
 					<input type="text" name="user" placeholder="user" id="user" required>
+				<div class="g-recaptcha" data-sitekey="6Ldmoj0jAAAAAKYyHaDbjhvncIOSjkFGTxMeT-OG"></div>
 				<input type="submit" value="Submit Password Recovery Request">
 			</form>
 			<form action="register.php">

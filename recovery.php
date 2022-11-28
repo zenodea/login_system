@@ -6,6 +6,27 @@ session_start();
 // Preparing error array
 $error = array();
 
+//Captcha Checker
+if(isset($_POST['g-recaptcha-response']))
+{
+  $captcha=$_POST['g-recaptcha-response'];
+}
+$secretKey = "6Ldmoj0jAAAAAIWrcfVRMYAb-C19UvaDA3Me_069";
+$url = 'https://www.google.com/recaptcha/api/siteverify?secret=' . urlencode($secretKey) .  '&response=' . urlencode($captcha);
+$response = file_get_contents($url);
+$responseKeys = json_decode($response,true);
+if($responseKeys["success"]) 
+{
+}
+else
+{
+	$error = array();
+	array_push($error, 'Please complete capcha!');
+	$_SESSION['error'] = $error;
+	header('Location: recovery_html.php');
+	exit();
+}
+
 //CSRF token check (and time check)
 if(isset($_POST) & !empty($_POST))
 {
