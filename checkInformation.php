@@ -47,6 +47,27 @@ if(isset($_POST) & !empty($_POST))
 	}
 }
 
+//Captcha Checker
+if(isset($_POST['g-recaptcha-response']))
+{
+  $captcha=$_POST['g-recaptcha-response'];
+}
+$secretKey = "6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe";
+$url = 'https://www.google.com/recaptcha/api/siteverify?secret=' . urlencode($secretKey) .  '&response=' . urlencode($captcha);
+$response = file_get_contents($url);
+$responseKeys = json_decode($response,true);
+
+// should return JSON with success as true
+if($responseKeys["success"]) 
+{
+}
+else
+{
+	$_SESSION['error'] = 'Please complete capcha!';
+	header('Location: login.php');
+	exit();
+}
+
 // Validate password strength
 $uppercase = preg_match('@[A-Z]@', $_SESSION['password']);
 $lowercase = preg_match('@[a-z]@', $_SESSION['password']);

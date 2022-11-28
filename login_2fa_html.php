@@ -35,5 +35,13 @@
 				<input type="password" name="2fa" placeholder="2FA PIN" id="password">
 				<input type="submit" value="Login" >
 			</form>
+		<form action="register.php">
+		<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
+			<input type="submit" value="Register" />
+		</form>
+		<form action="recovery_html.php">
+		<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
+			<input type="submit" value="Forgot Password" />
+		</form>
 	</body>
 </html>
