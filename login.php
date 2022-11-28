@@ -49,7 +49,7 @@
 				</label>
 				<input type="password" name="password" placeholder="Password" id="password">
 				<br>
-				<div class="g-recaptcha" data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"></div>
+				<div class="g-recaptcha" data-sitekey="6Ldmoj0jAAAAAKYyHaDbjhvncIOSjkFGTxMeT-OG"></div>
 				<input type="submit" value="Login" >
 			</form>
 		<form action="register.php">

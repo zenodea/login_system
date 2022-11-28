@@ -145,7 +145,7 @@ if (isset($_SESSION["error"]) & !empty($_SESSION["error"])) {echo "<p class='ale
   </select>
   <input type="submit" value="Submit">
   <div class="text-center">
-  <div class="g-recaptcha" data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"></div>
+  <div class="g-recaptcha" data-sitekey="6Ldmoj0jAAAAAKYyHaDbjhvncIOSjkFGTxMeT"></div>
 	</div>
 </form>
  </div>
