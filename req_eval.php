@@ -40,6 +40,28 @@ if(isset($_POST) & !empty($_POST))
 	}
 }
 
+//Captcha Check
+if(isset($_POST['g-recaptcha-response']))
+{
+  $captcha=$_POST['g-recaptcha-response'];
+}
+$secretKey = "6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe";
+$url = 'https://www.google.com/recaptcha/api/siteverify?secret=' . urlencode($secretKey) .  '&response=' . urlencode($captcha);
+$response = file_get_contents($url);
+$responseKeys = json_decode($response,true);
+
+
+// should return JSON with success as true
+if($responseKeys["success"]) 
+{
+}
+else
+{
+	$_SESSION['error'] = 'Please complete capcha!';
+	header('Location: req_eval_html.php');
+	exit();
+}
+
 // Change this to your connection info.
 $DATABASE_HOST = '127.0.0.1';
 $DATABASE_USER = 'root';

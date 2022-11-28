@@ -84,11 +84,20 @@ $_SESSION['csrf_token_time'] = time();
 		background-color: #435165;
 			transition: background-color 0.2s;
 		}
+    	.text-center {
+        text-align: center;
+    	}
+
+    	.g-recaptcha {
+		padding: 30px;
+        display: inline-block;
+    	}
 		</style>
 		<meta charset="utf-8">
 		<title>Request Evalutation Page</title>
 		<link href="style.css" rel="stylesheet" type="text/css">
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+		<script src='https://www.google.com/recaptcha/api.js' async defer></script>
 	</head>
 	<nav class="navtop">
 		<div>
@@ -134,8 +143,10 @@ if (isset($_SESSION["error"]) & !empty($_SESSION["error"])) {echo "<p class='ale
 			<?php echo "Phone Number: ". $category["phone_no"];?>
 		</option>
   </select>
-
   <input type="submit" value="Submit">
+  <div class="text-center">
+  <div class="g-recaptcha" data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"></div>
+	</div>
 </form>
  </div>
 </body>
