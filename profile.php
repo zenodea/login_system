@@ -3,36 +3,48 @@
 session_start();
 
 // If the user is not logged in redirect to the login page...
-if (!isset($_SESSION['loggedin'])) {
+if (!isset($_SESSION['loggedin'])) 
+{
 	header('Location: index.html');
 	exit;
 }
 
-$DATABASE_HOST = '127.0.0.1';
-$DATABASE_USER = 'root';
-$DATABASE_PASS = '';
-$DATABASE_NAME = 'lovejoy_db';
+// Change this to your connection info.
+$configs = include('config/config.php');
+$DATABASE_HOST = $configs['host'];
+$DATABASE_USER = $configs['username'];
+$DATABASE_PASS = $configs['db_pass'];
+$DATABASE_NAME = $configs['db_name'];
 
 $con = mysqli_connect($DATABASE_HOST, $DATABASE_USER, $DATABASE_PASS, $DATABASE_NAME);
-if (mysqli_connect_errno()) {
+if (mysqli_connect_errno()) 
+{
 	exit('Failed to connect to MySQL: ' . mysqli_connect_error());
 }
-// We don't have the password or email info stored in sessions so instead we can get the results from the database.
-$stmt = $con->prepare('SELECT phone_no, email, admin FROM accounts WHERE id = ?');
-// In this case we can use the account ID to get the account info.
-$stmt->bind_param('i', $_SESSION['id']);
-$stmt->execute();
-$stmt->bind_result($phone, $email, $admin);
-$stmt->fetch();
-$stmt->close();
 
+// We don't have the password or email info stored in sessions so instead we can get the results from the database.
+if ($stmt = $con->prepare('SELECT phone_no, email, admin FROM accounts WHERE id = ?'))
+{
+	// In this case we can use the account ID to get the account info.
+	$stmt->bind_param('i', $_SESSION['id']);
+	$stmt->execute();
+	$stmt->bind_result($phone, $email, $admin);
+	$stmt->fetch();
+	$stmt->close();
+}
+else
+{
+
+}
+
+// Preparing decryption items
 $password = $_SESSION['password'];
 $key = substr(hash('sha256', $password, true), 0, 32);
 $cipher = 'aes-256-gcm';
 $iv_len = openssl_cipher_iv_length($cipher);
 $tag_length = 16;
 
-
+// Phone to decrypt
 $textToDecrypt = $phone;
 $encrypted = base64_decode($textToDecrypt);
 $iv = substr($encrypted, 0, $iv_len);
@@ -40,6 +52,7 @@ $ciphertext = substr($encrypted, $iv_len, -$tag_length);
 $tag = substr($encrypted, -$tag_length);
 $phone = openssl_decrypt($ciphertext, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag);
 
+// Email to decrypt
 $textToDecrypt = $email;
 $encrypted = base64_decode($textToDecrypt);
 $iv = substr($encrypted, 0, $iv_len);
@@ -85,7 +98,7 @@ if ($stmt = $con->prepare('SELECT id FROM 2fa WHERE id = ?'))
 	<body class="loggedin">
 		<nav class="navtop">
 			<div>
-				<h1>Website Title</h1>
+				<h1>Love Joy</h1>
 				<a href="profile.php"><i class="fas fa-user-circle"></i>Profile</a>
 				<a href="req_eval_html.php"><i class="fas fa-dragon"></i>Request Evaluation</a>
 				<a href="list_eval.php"><i class="fas fa-dragon"></i>View Evaluations</a>
@@ -95,22 +108,22 @@ if ($stmt = $con->prepare('SELECT id FROM 2fa WHERE id = ?'))
 		<div class="content">
 			<h2>Profile Page</h2>
 			<?php
-			if (isset($_SESSION["error"]) & !empty($_SESSION["error"])) 
-			{
-				foreach($_SESSION['error'] as $key => $value)
+				if (isset($_SESSION["error"]) & !empty($_SESSION["error"])) 
 				{
-				echo "<p class='alert alert-danger'>". $value . "</p>"; 
+					foreach($_SESSION['error'] as $key => $value)
+					{
+						echo "<p class='alert alert-danger'>". $value . "</p>"; 
+					}
 				}
-			}
-			$_SESSION['error'] = NULL;
-			if (isset($_SESSION['success']) & !empty($_SESSION['success']))
-			{
-				foreach($_SESSION['success'] as $key => $value)
+				$_SESSION['error'] = NULL;
+				if (isset($_SESSION['success']) & !empty($_SESSION['success']))
 				{
-				echo "<p class='alert alert-success'>". $value . "</p>"; 
+					foreach($_SESSION['success'] as $key => $value)
+					{
+						echo "<p class='alert alert-success'>". $value . "</p>"; 
+					}
 				}
-			}
-			$_SESSION['success'] = NULL;
+				$_SESSION['success'] = NULL;
 			?>
 			<div>
 				<p>Your account details are below:</p>
@@ -137,22 +150,22 @@ if ($stmt = $con->prepare('SELECT id FROM 2fa WHERE id = ?'))
 					</tr>
 				</table><br>
 			<?php
-			if ($twofact == "Not Active")
-			{
-				?>
-				<form action="twofactorauth_html.php" method="POST">
-				<input type="submit" value="Activate 2FA" />
-				</form>
-				<?php
-			}
-			else
-			{
-				?>
-				<form action="twofactor_deactivate.php" method="POST">
-				<input type="submit" value="Deactivate 2FA" />
-				</form>
-				<?php
-			}
+				if ($twofact == "Not Active")
+				{
+					?>
+					<form action="twofactorauth_html.php" method="POST">
+					<input type="submit" value="Activate 2FA" />
+					</form>
+					<?php
+				}
+				else
+				{
+					?>
+					<form action="twofactor_deactivate.php" method="POST">
+					<input type="submit" value="Deactivate 2FA" />
+					</form>
+					<?php
+				}
 			?>
 		<br>
 		<form action="change_profile_item_html.php" method="POST">

@@ -36,13 +36,23 @@ if(isset($_POST) & !empty($_POST))
 }
 
 // Change this to your connection info.
-$DATABASE_HOST = '127.0.0.1';
-$DATABASE_USER = 'root';
-$DATABASE_PASS = '';
-$DATABASE_NAME = 'lovejoy_db';
+$configs = include('config/config.php');
+$DATABASE_HOST = $configs['host'];
+$DATABASE_USER = $configs['username'];
+$DATABASE_PASS = $configs['db_pass'];
+$DATABASE_NAME = $configs['db_name'];
 
+// Try and connect using the info above.
+$con = mysqli_connect($DATABASE_HOST, $DATABASE_USER, $DATABASE_PASS, $DATABASE_NAME);
+if ( mysqli_connect_errno() ) {
+	// If there is an error with the connection, stop the script and display the error.
+	exit('Failed to connect to MySQL: ' . mysqli_connect_error());
+}
+
+// Preparing error array for 
 $error = array();
 
+// Making sure both password match
 if ($_POST['password'] != $_POST['retype'])
 {
     array_push($error, 'Passwords do not match!');
@@ -82,13 +92,6 @@ if(!$uppercase || !$lowercase || !$number || !$specialChars || strlen($_POST['pa
 	$_SESSION['error'] = $error;
     header('Location: '.$_SESSION['url']);
 	exit();
-}
-
-// Try and connect using the info above.
-$con = mysqli_connect($DATABASE_HOST, $DATABASE_USER, $DATABASE_PASS, $DATABASE_NAME);
-if ( mysqli_connect_errno() ) {
-	// If there is an error with the connection, stop the script and display the error.
-	exit('Failed to connect to MySQL: ' . mysqli_connect_error());
 }
 
 if ($stmt = $con->prepare('DELETE FROM recovery_password WHERE username = ?')) 

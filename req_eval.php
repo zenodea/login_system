@@ -3,7 +3,8 @@ error_reporting(E_ALL);
 ini_set('display_errors',1);
 session_start();
 
-if (!isset($_SESSION['loggedin'])) {
+if (!isset($_SESSION['loggedin'])) 
+{
 	header('Location: index.html');
 	exit;
 }
@@ -49,8 +50,6 @@ $secretKey = "6Ldmoj0jAAAAAIWrcfVRMYAb-C19UvaDA3Me_069";
 $url = 'https://www.google.com/recaptcha/api/siteverify?secret=' . urlencode($secretKey) .  '&response=' . urlencode($captcha);
 $response = file_get_contents($url);
 $responseKeys = json_decode($response,true);
-
-
 // should return JSON with success as true
 if($responseKeys["success"]) 
 {
@@ -63,20 +62,22 @@ else
 }
 
 // Change this to your connection info.
-$DATABASE_HOST = '127.0.0.1';
-$DATABASE_USER = 'root';
-$DATABASE_PASS = '';
-$DATABASE_NAME = 'lovejoy_db';
+$configs = include('config/config.php');
+$DATABASE_HOST = $configs['host'];
+$DATABASE_USER = $configs['username'];
+$DATABASE_PASS = $configs['db_pass'];
+$DATABASE_NAME = $configs['db_name'];
 
 // Try and connect using the info above.
 $con = mysqli_connect($DATABASE_HOST, $DATABASE_USER, $DATABASE_PASS, $DATABASE_NAME);
-
-if ( mysqli_connect_errno() ) {
+if (mysqli_connect_errno()) 
+{
 	// If there is an error with the connection, stop the script and display the error.
 	exit('Failed to connect to MySQL: ' . mysqli_connect_error());
 }
 
-if (!empty($_FILES['userfile']['name'])) {
+if (!empty($_FILES['userfile']['name'])) 
+{
 	//Prepare file upload information
 	$allowed = array('png', 'jpg');
 	$filename = $_FILES['userfile']['name'];
@@ -85,29 +86,36 @@ if (!empty($_FILES['userfile']['name'])) {
 	$uploadfile = $uploaddir . basename($_FILES['userfile']['name']);
 
 	//Check file type
-	if (!in_array($ext, $allowed)) {
+	if (!in_array($ext, $allowed)) 
+	{
 		$_SESSION['error'] = "Wrong File Format (Please use png or jpg)!";
 		header('Location: req_eval_html.php');
 		exit();
 	}
 
 	// Check if file already exists
-	if (file_exists($uploadfile)) {
+	if (file_exists($uploadfile)) 
+	{
 		$_SESSION['error'] = "File already exists!";
 		header('Location: req_eval_html.php');
 		exit();
 	}
 
 	// Check file size
-	if ($_FILES["userfile"]["size"] > 500000) {
+	if ($_FILES["userfile"]["size"] > 500000) 
+	{
 		$_SESSION['error'] = "Upload failed, file size to large!";
 		header('Location: req_eval_html.php');
 		exit();
 	}
-	if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
+
+	// Move File
+	if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) 
+	{
 		$_SESSION['correct'] = "The file ". htmlspecialchars(basename( $_FILES["usefile"]["name"])). " has been uploaded.";
 	}
-	else {
+	else 
+	{
 		$_SESSION['error'] = $_FILES['userfile']['tmp_name'];
 		header('Location: req_eval_html.php');
 		exit();
@@ -117,15 +125,19 @@ else
 {
 	$uploadfile = "None";
 }
+
+// Preparing variabels
 $id = $_SESSION['id'];
 $header = $_POST['topic'];
 $body = $_POST['body'];
 $contact = $_POST['contact'];
 
-if ($stmt = $con->prepare("INSERT INTO evaluations (id_user, header, comment, url, contact) VALUES (?, ?, ?, ?, ?)")) {
-		$stmt->bind_param('sssss', $id, $header, $body, $uploadfile, $contact);
-		$stmt->execute();
-	} 
+if ($stmt = $con->prepare("INSERT INTO evaluations (id_user, header, comment, url, contact) VALUES (?, ?, ?, ?, ?)")) 
+{
+	$stmt->bind_param('sssss', $id, $header, $body, $uploadfile, $contact);
+	$stmt->execute();
+} 
+$_SESSION['correct'] = "Evaluation succesfully uploaded!";
 header('Location: req_eval_html.php');
 exit();
 ?>

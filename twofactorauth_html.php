@@ -3,6 +3,11 @@ session_start();
 require_once(__DIR__.'/vendor/autoload.php'); 
 
 use RobThree\Auth\TwoFactorAuth;
+
+// Preparing and setting CSRF token
+$token =  bin2hex(random_bytes(32));
+$_SESSION['csrf_token'] = $token;
+$_SESSION['csrf_token_time'] = time();
 ?>
 <!doctype html>
 <html>
@@ -16,7 +21,7 @@ use RobThree\Auth\TwoFactorAuth;
 	<body class="loggedin">
 		<nav class="navtop">
 			<div>
-				<h1>Website Title</h1>
+				<h1>Love Joy</h1>
 				<a href="profile.php"><i class="fas fa-user-circle"></i>Profile</a>
 				<a href="req_eval_html.php"><i class="fas fa-dragon"></i>Request Evaluation</a>
 				<a href="list_eval.php"><i class="fas fa-dragon"></i>View Evaluations</a>
@@ -34,8 +39,6 @@ use RobThree\Auth\TwoFactorAuth;
 
                     // substitute your company or app name here
                     $tfa = new RobThree\Auth\TwoFactorAuth('Lovejoy 2FA');
-                ?>
-                <?php
                     $secret = $tfa->createSecret();
                 ?>
                 <li>
@@ -58,11 +61,13 @@ use RobThree\Auth\TwoFactorAuth;
                     <?php } ?>
                 </li>
             <form action="twofactorauth.php" method="POST">
+				<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
                 <input type=hidden value=<?php echo $secret;?> name="secret" />
                 <input type="submit" value="Complete (Make sure the app is connected before continuing)" />
             </form>
             <br>
             <form action="profile.php" method="POST">
+				<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
                 <input type="submit" value="Go Back" />
             </form>
         </div>

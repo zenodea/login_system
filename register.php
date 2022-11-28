@@ -1,6 +1,7 @@
 <?php
 session_start(); // must be before any output
 
+// Preparing and Setting Token
 $token =  bin2hex(random_bytes(32));
 $_SESSION['csrf_token'] = $token;
 $_SESSION['csrf_token_time'] = time();
@@ -21,25 +22,25 @@ $_SESSION['csrf_token_time'] = time();
 		<div class="login">
 			<h1>Register</h1>
 			<?php
-			if (isset($_SESSION["error"]) & !empty($_SESSION["error"])) 
-			{
-				foreach($_SESSION['error'] as $key => $value)
+				if (isset($_SESSION["error"]) & !empty($_SESSION["error"])) 
 				{
-				echo "<p class='alert alert-danger'>". $value . "</p>"; 
+					foreach($_SESSION['error'] as $key => $value)
+					{
+					echo "<p class='alert alert-danger'>". $value . "</p>"; 
+					}
 				}
-			}
-			$_SESSION['error'] = NULL;
-			if (isset($_SESSION['success']) & !empty($_SESSION['success']))
-			{
-				foreach($_SESSION['success'] as $key => $value)
+				$_SESSION['error'] = NULL;
+				if (isset($_SESSION['success']) & !empty($_SESSION['success']))
 				{
-				echo "<p class='alert alert-success'>". $value . "</p>"; 
+					foreach($_SESSION['success'] as $key => $value)
+					{
+					echo "<p class='alert alert-success'>". $value . "</p>"; 
+					}
 				}
-			}
-			$_SESSION['success'] = NULL;
+				$_SESSION['success'] = NULL;
 			?>
 			<form action="checkInformation.php" method="POST" autocomplete="off">
-			<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
+				<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
 				<label for="username">
 					<i class="fas fa-user"></i>
 				</label>
@@ -59,13 +60,13 @@ $_SESSION['csrf_token_time'] = time();
 				<br>
 				<div class="g-recaptcha" data-sitekey="6Ldmoj0jAAAAAKYyHaDbjhvncIOSjkFGTxMeT-OG"></div>
 				<input type="submit" value="Register">
-			</form>
+		</form>
 		<form action="login.php">
 			<input type="submit" value="Login" />
 		</form>
 		<form action="recovery_html.php">
-		<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
-			<input type="submit" value="Forgot Password" />
+			<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
+				<input type="submit" value="Forgot Password" />
 		</form>
 		</div>
 	</body>

@@ -1,11 +1,13 @@
 <?php
 session_start();
 
+// Store information
 $_SESSION['username'] = $_POST['username'];
 $_SESSION['password'] = $_POST['password'];
 $_SESSION['email'] = $_POST['email'];
 $_SESSION['phone'] = $_POST['phone'];
 
+// Create error message array
 $error = array();
 
 
@@ -50,8 +52,6 @@ $secretKey = "6Ldmoj0jAAAAAIWrcfVRMYAb-C19UvaDA3Me_069";
 $url = 'https://www.google.com/recaptcha/api/siteverify?secret=' . urlencode($secretKey) .  '&response=' . urlencode($captcha);
 $response = file_get_contents($url);
 $responseKeys = json_decode($response,true);
-
-// should return JSON with success as true
 if($responseKeys["success"]) 
 {
 }
@@ -62,7 +62,7 @@ else
 	exit();
 }
 
-// Validate password strength
+// Validate password strength (Password Entropy)
 $uppercase = preg_match('@[A-Z]@', $_SESSION['password']);
 $lowercase = preg_match('@[a-z]@', $_SESSION['password']);
 $number    = preg_match('@[0-9]@', $_SESSION['password']);

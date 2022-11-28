@@ -1,4 +1,6 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors',1);
 session_start();
 $empty = FALSE;
 
@@ -13,9 +15,6 @@ $secretKey = "6Ldmoj0jAAAAAIWrcfVRMYAb-C19UvaDA3Me_069";
 $url = 'https://www.google.com/recaptcha/api/siteverify?secret=' . urlencode($secretKey) .  '&response=' . urlencode($captcha);
 $response = file_get_contents($url);
 $responseKeys = json_decode($response,true);
-
-
-// should return JSON with success as true
 if($responseKeys["success"]) 
 {
 }
@@ -26,6 +25,7 @@ else
 	exit();
 }
 
+//Check if username or password have been set
 if (isset($_POST) & !empty($_POST))
 {
 	if(empty($_POST['username'])) { $_SESSION['usernameError'] = "Insert Username";$empty = TRUE; }
@@ -71,69 +71,73 @@ if(isset($_POST) & !empty($_POST))
 }
 
 // Change this to your connection info.
-$DATABASE_HOST = '127.0.0.1';
-$DATABASE_USER = 'root';
-$DATABASE_PASS = '';
-$DATABASE_NAME = 'lovejoy_db';
+$configs = include('config/config.php');
+$DATABASE_HOST = $configs['host'];
+$DATABASE_USER = $configs['username'];
+$DATABASE_PASS = $configs['db_pass'];
+$DATABASE_NAME = $configs['db_name'];
 
 
 
 // Try and connect using the info above.
 $con = mysqli_connect($DATABASE_HOST, $DATABASE_USER, $DATABASE_PASS, $DATABASE_NAME);
-if ( mysqli_connect_errno() ) {
+if ( mysqli_connect_errno() ) 
+{
 	// If there is an error with the connection, stop the script and display the error.
 	exit('Failed to connect to MySQL: ' . mysqli_connect_error());
 }
 
 //Check if three attempts have been made
 if ($stmt = $con->prepare('SELECT * FROM ip WHERE address = ?'))
+{
+	$stmt->bind_param('s', $_SERVER["REMOTE_ADDR"]);
+	$stmt->execute();
+	// Store the result so we can check if the account exists in the database.
+	$stmt->store_result();
+	if ($stmt->num_rows > 0)
 	{
-		$stmt->bind_param('s', $_SERVER["REMOTE_ADDR"]);
-		$stmt->execute();
-		// Store the result so we can check if the account exists in the database.
-		$stmt->store_result();
-		if ($stmt->num_rows > 0)
+		$ip = $_SERVER["REMOTE_ADDR"];
+		$result = mysqli_query($con, "SELECT * FROM `ip` WHERE `address` = '$ip' AND `timestamp`  + INTERVAL 10 MINUTE < NOW()");
+		if ($result->num_rows > 0)
 		{
-			$ip = $_SERVER["REMOTE_ADDR"];
-			$result = mysqli_query($con, "SELECT * FROM `ip` WHERE `address` = '$ip' AND `timestamp`  + INTERVAL 10 MINUTE < NOW()");
-			if ($result->num_rows > 0)
-			{
-				mysqli_query($con, "DELETE FROM `ip` WHERE `address` = '$ip'");
-				$_SESSION['counter'] = 0;
-				$_SESSION["error"] = "You may try again!";	
-				header('Location: login.php');
-				exit();
-			}
-			else
-			{
-				$_SESSION['counter'] = 0;
-				$_SESSION["error"] = "Please wait!";	
-				header('Location: login.php');
-				exit();
-			}
+			mysqli_query($con, "DELETE FROM `ip` WHERE `address` = '$ip'");
+			$_SESSION['counter'] = 0;
+			$_SESSION["error"] = "You may try again!";	
+			header('Location: login.php');
+			exit();
 		}
 		else
 		{
-			if ($_SESSION['counter'] == 4)
-			{
-				$ip = $_SERVER["REMOTE_ADDR"];
-				mysqli_query($con, "INSERT INTO `ip` (`address` ,`timestamp`)VALUES ('$ip',CURRENT_TIMESTAMP)");
-				$_SESSION["error"] = "Maximum amount of attempts reached, please wait 10 minutes!";	
-				$_SESSION['counter'] = 0;
-				header('Location: login.php');
-				exit();
-			}
+			$_SESSION['counter'] = 0;
+			$_SESSION["error"] = "Please wait!";	
+			header('Location: login.php');
+			exit();
 		}
 	}
+	else
+	{
+		if ($_SESSION['counter'] == 4)
+		{
+			$ip = $_SERVER["REMOTE_ADDR"];
+			mysqli_query($con, "INSERT INTO `ip` (`address` ,`timestamp`)VALUES ('$ip',CURRENT_TIMESTAMP)");
+			$_SESSION["error"] = "Maximum amount of attempts reached, please wait 10 minutes!";	
+			$_SESSION['counter'] = 0;
+			header('Location: login.php');
+			exit();
+		}
+	}
+}
 
 // Now we check if the data from the login form was submitted, isset() will check if the data exists.
-if ( !isset($_POST['username'], $_POST['password']) ) {
+if ( !isset($_POST['username'], $_POST['password']) ) 
+{
 	// Could not get the data that should have been sent.
-	header('LocationL index.html');
+	header('Location: index.html');
 }
 
 // Prepare our SQL, preparing the SQL statement will prevent SQL injection.
-if ($stmt = $con->prepare('SELECT id, pass, activation_code FROM accounts WHERE username = ?')) {
+if ($stmt = $con->prepare('SELECT id, pass, activation_code FROM accounts WHERE username = ?')) 
+{
 	// Bind parameters (s = string, i = int, b = blob, etc), in our case the username is a string so we use "s"
 	$stmt->bind_param('s', $_POST['username']);
 	$stmt->execute();

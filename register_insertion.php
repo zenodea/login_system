@@ -3,7 +3,7 @@ error_reporting(E_ALL);
 ini_set('display_errors',1);
 session_start();
 
-
+// Preparing Error array
 $error = array();
 
 //CSRF token check (and time check)
@@ -39,10 +39,11 @@ if(isset($_POST) & !empty($_POST))
 }
 
 // Change this to your connection info.
-$DATABASE_HOST = '127.0.0.1';
-$DATABASE_USER = 'root';
-$DATABASE_PASS = '';
-$DATABASE_NAME = 'lovejoy_db';
+$configs = include('config/config.php');
+$DATABASE_HOST = $configs['host'];
+$DATABASE_USER = $configs['username'];
+$DATABASE_PASS = $configs['db_pass'];
+$DATABASE_NAME = $configs['db_name'];
 
 $con = mysqli_connect($DATABASE_HOST, $DATABASE_USER, $DATABASE_PASS, $DATABASE_NAME);
 if ( mysqli_connect_errno() ) {
@@ -51,15 +52,18 @@ if ( mysqli_connect_errno() ) {
     echo "yikes";
 }
 
+// Setting up data
 $NEW_USERNAME 	= $_SESSION['username'];
 $NEW_EMAIL  	= $_SESSION['email'];
 $NEW_PASSWORD 	=  $_SESSION['password'];
 $NEW_PHONE 		= $_SESSION['phone'];
 
+// Setting up security questions
 $question_one = array($_POST['first_question'] => $_POST['first_answer']);
 $question_two = array($_POST['second_question'] => $_POST['second_answer']);
 $question_three = array($_POST['third_question'] => $_POST['third_answer']);
 
+// Making sure that the three security questions are unique
 if (array_key_exists(key($question_one), $question_two) 
 	| array_key_exists(key($question_one), $question_three)
 	| array_key_exists(key($question_two), $question_one)
@@ -82,7 +86,6 @@ $tag_length = 16;
 $iv = openssl_random_pseudo_bytes($iv_len);
 $tag = ""; // will be filled by openssl_encrypt
 
-
 if ($stmt = $con->prepare('SELECT id FROM accounts WHERE username = ?')) 
 {
 	$stmt->bind_param('s', $NEW_USERNAME);
@@ -104,9 +107,11 @@ if ($stmt = $con->prepare('SELECT id FROM accounts WHERE username = ?'))
 				$admin = 0;
 				$password = password_hash($NEW_PASSWORD, PASSWORD_DEFAULT);
 
+				//Encrypting email
 				$email = openssl_encrypt($NEW_EMAIL, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag, "", $tag_length);
 				$email = base64_encode($iv.$email.$tag);
 
+				//Encrypting  phone_no
 				$phone = openssl_encrypt($NEW_PHONE, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag, "", $tag_length);
 				$phone = base64_encode($iv.$phone.$tag);
 
@@ -114,35 +119,38 @@ if ($stmt = $con->prepare('SELECT id FROM accounts WHERE username = ?'))
 
 				$stmt->bind_param('ssssis', $NEW_USERNAME, $password, $email, $phone, $admin, $uniqid);
 				$stmt->execute();
-			if  ($stmt = $con->prepare('INSERT INTO security_questions VALUES (?, ?, ?, ?, ?, ?, ?)'))
-			{
-				$result = $con->insert_id;
-				// We do not want to expose passwords in our database, so hash the password and use password_verify when a user logs in.
-				$stmt->bind_param('iisisis', $result, 
-								  key($question_one), password_hash(current($question_one), PASSWORD_DEFAULT), 
-								  key($question_two), password_hash(current($question_two), PASSWORD_DEFAULT),
-								  key($question_three), password_hash(current($question_three), PASSWORD_DEFAULT),);
+				if  ($stmt = $con->prepare('INSERT INTO security_questions VALUES (?, ?, ?, ?, ?, ?, ?)'))
+				{
+					// Get newest ID (from newly created account)
+					$result = $con->insert_id;
+					// We do not want to expose passwords in our database, so hash the password and use password_verify when a user logs in.
+					$stmt->bind_param('iisisis', $result, 
+									key($question_one), password_hash(current($question_one), PASSWORD_DEFAULT), 
+									key($question_two), password_hash(current($question_two), PASSWORD_DEFAULT),
+									key($question_three), password_hash(current($question_three), PASSWORD_DEFAULT),);
+					$stmt->execute();
 
-				$stmt->execute();
-				$from    = 'noreply215872@gmail.com';
-				$subject = 'Account Activation Required';
-				$headers = 'From: ' . $from . "\r\n" . 'Reply-To: ' . $from . "\r\n" . 'X-Mailer: PHP/' . phpversion() . "\r\n" . 'MIME-Version: 1.0' . "\r\n" . 'Content-Type: text/html; charset=UTF-8' . "\r\n";
-				// Update the activation variable below
-				$activate_link = 'localhost/ComputerSecurity/activate.php?email=' . $NEW_EMAIL . '&code=' . $uniqid;
-				$message = '<p>Please click the following link to activate your account: <a href="' . $activate_link . '">' . $activate_link . '</a></p>';
-				mail($NEW_EMAIL, $subject, $message, $headers);
-				$success = array();
-				array_push($success,'Account Succesfully Created!');
-				array_push($success,'An email has been sent with an activation link.');
-				array_push($success,'please Activate your Account!'); $_SESSION['success'] = $success;
-				header('Location: register.php');
-				exit();
-			}
-			else
-			{
-			// Something is wrong with the sql statement, check to make sure accounts table exists with all 3 fields.
-			echo 'Could not prepare statement!';
-			}
+					// Preparing Mail
+					$from    = 'lovejoy_no_reply@gmail.com';
+					$subject = 'Account Activation Required';
+					$headers = 'From: ' . $from . "\r\n" . 'Reply-To: ' . $from . "\r\n" . 'X-Mailer: PHP/' . phpversion() . "\r\n" . 'MIME-Version: 1.0' . "\r\n" . 'Content-Type: text/html; charset=UTF-8' . "\r\n";
+					$activate_link = 'localhost/ComputerSecurity/activate.php?email=' . $NEW_EMAIL . '&code=' . $uniqid;
+					$message = '<p>Please click the following link to activate your account: <a href="' . $activate_link . '">' . $activate_link . '</a></p>';
+					mail($NEW_EMAIL, $subject, $message, $headers);
+
+					// Success
+					$success = array();
+					array_push($success,'Account Succesfully Created!');
+					array_push($success,'An email has been sent with an activation link.');
+					array_push($success,'please Activate your Account!'); $_SESSION['success'] = $success;
+					header('Location: register.php');
+					exit();
+				}
+				else
+				{
+				// Something is wrong with the sql statement, check to make sure accounts table exists with all 3 fields.
+				echo 'Could not prepare statement!';
+				}
 		} 
 		else 
 		{

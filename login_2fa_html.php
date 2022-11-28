@@ -1,15 +1,15 @@
 <?php
-  session_start(); // must be before any output
-  if (!isset($_SESSION['counter']))
-  {
-	$_SESSION['counter'] = 0;
-  }
+session_start(); // must be before any output
 
-  $token =  bin2hex(random_bytes(32));
-  $_SESSION['csrf_token'] = $token;
-  $_SESSION['csrf_token_time'] = time();
+if (!isset($_SESSION['counter']))
+{
+$_SESSION['counter'] = 0;
+}
 
-
+// Preparing CSRF Token
+$token =  bin2hex(random_bytes(32));
+$_SESSION['csrf_token'] = $token;
+$_SESSION['csrf_token_time'] = time();
 ?>
 
 <!DOCTYPE html>
@@ -27,7 +27,7 @@
 			<?php 
 			if (isset($_SESSION["error"]) & !empty($_SESSION["error"])) {echo "<p class='alert alert-danger'>". $_SESSION["error"] . " </p>"; $_SESSION['error'] = NULL;}
 			?>
-		<form  action="login_2fa.php"  method="POST" required>
+			<form  action="login_2fa.php"  method="POST" required>
 				<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
 				<label for="password">
 					<i class="fas fa-lock"></i>
@@ -35,13 +35,13 @@
 				<input type="password" name="2fa" placeholder="2FA PIN" id="password">
 				<input type="submit" value="Login" >
 			</form>
-		<form action="register.php">
-		<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
-			<input type="submit" value="Register" />
-		</form>
-		<form action="recovery_html.php">
-		<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
-			<input type="submit" value="Forgot Password" />
-		</form>
+			<form action="register.php">
+			<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
+				<input type="submit" value="Register" />
+			</form>
+			<form action="recovery_html.php">
+			<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
+				<input type="submit" value="Forgot Password" />
+			</form>
 	</body>
 </html>

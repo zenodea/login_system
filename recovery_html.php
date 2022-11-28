@@ -1,6 +1,8 @@
 <?php
 session_start(); // must be before any output
-$token = md5(uniqid(rand(), true));
+
+// Preparing and setting CSRF token
+$token =  bin2hex(random_bytes(32));
 $_SESSION['csrf_token'] = $token;
 $_SESSION['csrf_token_time'] = time();
 ?>
@@ -18,39 +20,37 @@ $_SESSION['csrf_token_time'] = time();
 		<div class="login">
 			<h1>Recovery</h1>
 			<?php
-			if (isset($_SESSION["error"]) & !empty($_SESSION["error"])) 
-			{
-				foreach($_SESSION['error'] as $key => $value)
+				if (isset($_SESSION["error"]) & !empty($_SESSION["error"])) 
 				{
-				echo "<p class='alert alert-danger'>". $value . "</p>"; 
+					foreach($_SESSION['error'] as $key => $value)
+					{
+					echo "<p class='alert alert-danger'>". $value . "</p>"; 
+					}
 				}
-			}
-			$_SESSION['error'] = NULL;
-			if (isset($_SESSION['success']) & !empty($_SESSION['success']))
-			{
-				foreach($_SESSION['success'] as $key => $value)
+				$_SESSION['error'] = NULL;
+				if (isset($_SESSION['success']) & !empty($_SESSION['success']))
 				{
-				echo "<p class='alert alert-success'>". $value . "</p>"; 
+					foreach($_SESSION['success'] as $key => $value)
+					{
+					echo "<p class='alert alert-success'>". $value . "</p>"; 
+					}
 				}
-			}
-			$_SESSION['success'] = NULL;
+				$_SESSION['success'] = NULL;
 			?>
 			<form action="recovery.php" method="POST" class="signup-form">
-			<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
-                <label for="Username">
-                    <i class="fas fa-user"></i>
-                </label>
-                <input type="text" name="user" placeholder="user" id="user" required>
+				<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
+				<label for="Username"> <i class="fas fa-user"></i> </label>
+					<input type="text" name="user" placeholder="user" id="user" required>
 				<input type="submit" value="Submit Password Recovery Request">
 			</form>
-		<form action="register.php">
-		<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
-			<input type="submit" value="Register" />
-		</form>
-        <form action="login.php">
-		<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
-			<input type="submit" value="Login" />
-		</form>
+			<form action="register.php">
+				<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
+					<input type="submit" value="Register" />
+			</form>
+			<form action="login.php">
+				<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
+				<input type="submit" value="Login" />
+			</form>
 		</div>
 	</body>
 </html>

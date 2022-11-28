@@ -4,12 +4,13 @@ ini_set('display_errors',1);
 session_start();
 
 // If the user is not logged in redirect to the login page...
-if (!isset($_SESSION['loggedin'])) {
+if (!isset($_SESSION['loggedin'])) 
+{
 	header('Location: index.html');
 	exit;
 }
 
-
+// Saving the value wanted to be changed
 if ($_SESSION['change'] == "phone")
 {
     $value = "Phone Number";
@@ -25,14 +26,25 @@ elseif ($_SESSION['change'] == "password")
 }
 
 // Change this to your connection info.
-$DATABASE_HOST = '127.0.0.1';
-$DATABASE_USER = 'root';
-$DATABASE_PASS = '';
-$DATABASE_NAME = 'lovejoy_db';
+$configs = include('config/config.php');
+$DATABASE_HOST = $configs['host'];
+$DATABASE_USER = $configs['username'];
+$DATABASE_PASS = $configs['db_pass'];
+$DATABASE_NAME = $configs['db_name'];
+
+// Prepare to Decrypt
+$password = $_SESSION['password'];
+$key = substr(hash('sha256', $password, true), 0, 32);
+$cipher = 'aes-256-gcm';
+$iv_len = openssl_cipher_iv_length($cipher);
+$tag_length = 16;
+$iv = openssl_random_pseudo_bytes($iv_len);
+$tag = ""; // will be filled by openssl_encrypt
 
 // Try and connect using the info above.
 $con = mysqli_connect($DATABASE_HOST, $DATABASE_USER, $DATABASE_PASS, $DATABASE_NAME);
-if ( mysqli_connect_errno() ) {
+if (mysqli_connect_errno()) 
+{
 	// If there is an error with the connection, stop the script and display the error.
 	exit('Failed to connect to MySQL: ' . mysqli_connect_error());
 }
@@ -44,16 +56,31 @@ if ($stmt = $con->prepare('SELECT email, phone_no FROM accounts WHERE id = ?'))
     $stmt->store_result();
 	$stmt->bind_result($old_email, $old_phone_no);
 	$stmt->fetch();
+	$stmt->close();
     if ($value == "Phone Number")
     {
-        $oldValue = $old_phone_no;
+        $textToDecrypt = $old_phone_no;
+        $encrypted = base64_decode($textToDecrypt);
+        $iv = substr($encrypted, 0, $iv_len);
+        $ciphertext = substr($encrypted, $iv_len, -$tag_length);
+        $tag = substr($encrypted, -$tag_length);
+        $decrypted_value = openssl_decrypt($ciphertext, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag);
+        $oldValue = $decrypted_value;
     }
     elseif ($value == "Email")
     {
-        $oldValue = $old_email;
+        $textToDecrypt = $old_email;
+        $encrypted = base64_decode($textToDecrypt);
+        $iv = substr($encrypted, 0, $iv_len);
+        $ciphertext = substr($encrypted, $iv_len, -$tag_length);
+        $tag = substr($encrypted, -$tag_length);
+        $decrypted_value = openssl_decrypt($ciphertext, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag);
+        $oldValue = $oldValue = $decrypted_value;
+;
     }
 }
 
+// Preparing CSRF Token
 $token =  bin2hex(random_bytes(32));
 $_SESSION['csrf_token'] = $token;
 $_SESSION['csrf_token_time'] = time();
@@ -68,49 +95,49 @@ $_SESSION['csrf_token_time'] = time();
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
         <style>
-		form {
-			text-align: center;
-			align-items: center;
-			flex-wrap: wrap;
-			justify-content: center;
-			padding-top: 20px;
-		}
-		form label 
-		{
-			display: inline-block;
-			vertical-align: middle;
-			text-align: center;
-			justify-content: center;
-			align-items: center;
-			width: 200px;
-			height: 50px;
-			font-weight: bold;
+			form {
+				text-align: center;
+				align-items: center;
+				flex-wrap: wrap;
+				justify-content: center;
+				padding-top: 20px;
+			}
+			form label 
+			{
+				display: inline-block;
+				vertical-align: middle;
+				text-align: center;
+				justify-content: center;
+				align-items: center;
+				width: 200px;
+				height: 50px;
+				font-weight: bold;
+				background-color: #435165;
+				color: #ffffff;
+			}
+			form input[type="submit"] {
+				display: inline-block;
+				text-align: center;
+				width: 100%;
+				padding: 15px;
+				margin-top: 20px;
+				background-color: #435165;
+				border: 0;
+				cursor: pointer;
+				font-weight: bold;
+				color: #ffffff;
+				transition: background-color 0.2s;
+			}
+			form input[type="submit"]:hover {
 			background-color: #435165;
-			color: #ffffff;
-		}
-		form input[type="submit"] {
-			display: inline-block;
-			text-align: center;
-			width: 100%;
-			padding: 15px;
-			margin-top: 20px;
-			background-color: #435165;
-			border: 0;
-			cursor: pointer;
-			font-weight: bold;
-			color: #ffffff;
-			transition: background-color 0.2s;
-		}
-		form input[type="submit"]:hover {
-		background-color: #435165;
-			transition: background-color 0.2s;
-		}
-            </style>
+				transition: background-color 0.2s;
+			}
+	    </style>
 	</head>
 	<body class="loggedin">
 		<nav class="navtop">
 			<div>
-				<h1>Website Title</h1>
+				<h1>Love Joy</h1>
 				<a href="profile.php"><i class="fas fa-user-circle"></i>Profile</a>
 				<a href="req_eval_html.php"><i class="fas fa-dragon"></i>Request Evaluation</a>
 				<a href="list_eval.php"><i class="fas fa-dragon"></i>View Evaluations</a>
@@ -118,38 +145,45 @@ $_SESSION['csrf_token_time'] = time();
 			</div>
 		</nav>
         <?php 
-        if (isset($_SESSION['correct']) & !empty($_SESSION['correct'])){echo "<p class='alert alert-success'>". $_SESSION['correct'] . " </p>"; $_SESSION['correct'] = NULL;}
-		if (isset($_SESSION["error"]) & !empty($_SESSION["error"])) 
+			if (isset($_SESSION['correct']) & !empty($_SESSION['correct']))
+			{
+				echo "<p class='alert alert-success'>". $_SESSION['correct'] . " </p>"; $_SESSION['correct'] = NULL;
+			}
+			if (isset($_SESSION["error"]) & !empty($_SESSION["error"])) 
 			{
 				if (is_array($_SESSION['error']))
 				{
-				foreach($_SESSION['error'] as $key => $value)
-				{
-				echo "<p class='alert alert-danger'>". $value . "</p>"; 
-				}
+					foreach($_SESSION['error'] as $key => $value)
+					{
+						echo "<p class='alert alert-danger'>". $value . "</p>"; 
+					}
 				}
 				else
 				{
 					echo "<p class='alert alert-danger'>". $_SESSION["error"] . " </p>"; 
 				}
-			$_SESSION['error'] = NULL;
+				$_SESSION['error'] = NULL;
 			}
         ?>
 		<div class="content">
             <?php
-			if (isset($_SESSION["error"]) & !empty($_SESSION["error"])) {echo "<p class='alert alert-danger'>". $_SESSION["error"] . " </p>"; $_SESSION['error'] = NULL;}
+				if (isset($_SESSION["error"]) & !empty($_SESSION["error"])) 
+				{
+					echo "<p class='alert alert-danger'>". $_SESSION["error"] . " </p>"; 
+					$_SESSION['error'] = NULL;
+				}
 			?>
 			<h2>Answer Security Questions To Continue</h2>
 			<form action="change_value.php" method="POST" autocomplete="off">
-			<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
+				<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
 
-            <label><?php echo "Old " . $value;?></label>
-			<input type="text" name="oldValue" value=<?php echo $oldValue;?> id="Old Value" disabled="disabled"><br><br>
+				<label><?php echo "Old " . $value;?></label>
+					<input type="text" name="oldValue" value=<?php echo $oldValue;?> id="Old Value" disabled="disabled"><br><br>
 
-            <label><?php echo "New " . $value;?></label>
-			<input type="text" name="newValue" placeholder="New Value" id="New Value" required><br><br>
+				<label><?php echo "New " . $value;?></label>
+					<input type="text" name="newValue" placeholder="New Value" id="New Value" required><br><br>
 
-			<input type="submit" value="Continue">
+				<input type="submit" value="Continue">
 			</form>
 	</body>
 </html>
