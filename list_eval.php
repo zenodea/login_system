@@ -64,7 +64,7 @@ if ($stmt = $con->prepare('SELECT admin, id, public_key FROM accounts WHERE id =
 			$ciphertext = substr($encrypted, $iv_len, -$tag_length);
 			$tag = substr($encrypted, -$tag_length);
 			$private_key = openssl_decrypt($ciphertext, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag);
-			echo $_SESSION['password'];
+			echo $p_key;
 
 			$query = "SELECT id, id_user, header, comment, url, contact FROM evaluations";
 			$result = $con->query($query);

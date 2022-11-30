@@ -178,7 +178,7 @@ if ($stmt = $con->prepare("INSERT INTO evaluations (id_user, header, comment, ur
 				{
 					throw new Exception(openssl_error_string());
 				}
-				echo $encrypted_photo_key;
+				
 				$stmt->bind_param('iis', $evaluation_id, $row['id'], $encrypted_photo_key);
 				$stmt->execute();
 				$stmt->close();
