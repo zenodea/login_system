@@ -44,13 +44,21 @@ if ($stmt = $con->prepare('SELECT id, pass FROM accounts WHERE username = ?'))
     }
 }
 
-$key = openssl_pkey_new(array('private_key_bits' => 2048));
+$config = array(
+    "digest_alg" => "sha512",
+    "private_key_bits" => 2048,
+    "private_key_type" => OPENSSL_KEYTYPE_RSA,
+);
+   
+// Create the private and public key
+$key = openssl_pkey_new($config);
+openssl_pkey_export($key, $private_key, NULL, $config);
 $key_details = openssl_pkey_get_details($key);
 $public_key = $key_details['key'];
 if ($stmt = $con->prepare('INSERT INTO admin_key VALUES (?, ?)'))
 {
     //Prepare Encryption
-    $key = substr(hash('sha256', $password, true), 0, 32);
+    $key_something = substr(hash('sha256', $_POST['password'], true), 0, 32);
     $cipher = 'aes-256-gcm';
     $iv_len = openssl_cipher_iv_length($cipher);
     $tag_length = 16;
@@ -58,7 +66,7 @@ if ($stmt = $con->prepare('INSERT INTO admin_key VALUES (?, ?)'))
     $tag = ""; // will be filled by openssl_encrypt
 
     //Encrypting private key
-    $key_encrypted = openssl_encrypt($key, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag, "", $tag_length);
+    $key_encrypted = openssl_encrypt($private_key, $cipher, $key_something, OPENSSL_RAW_DATA, $iv, $tag, "", $tag_length);
     $key_encrypted = base64_encode($iv.$key_encrypted.$tag);
 
 	$stmt->bind_param('is', $id, $key_encrypted);

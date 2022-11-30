@@ -133,7 +133,7 @@ $body = $_POST['body'];
 $contact = $_POST['contact'];
 
 //Prepare Encryption
-$password_evaluation = uniqid();
+$password_evaluation = "YES";
 $key = substr(hash('sha256', $password_evaluation, true), 0, 32);
 $cipher = 'aes-256-gcm';
 $iv_len = openssl_cipher_iv_length($cipher);
@@ -171,17 +171,14 @@ if ($stmt = $con->prepare("INSERT INTO evaluations (id_user, header, comment, ur
 			{
 				//Prepare Encryption
 				$password = $row['public_key'];
-				$key = substr(hash('sha256', $password, true), 0, 32);
-				$cipher = 'aes-256-gcm';
-				$iv_len = openssl_cipher_iv_length($cipher);
-				$tag_length = 16;
-				$iv = openssl_random_pseudo_bytes($iv_len);
-				$tag = ""; // will be filled by openssl_encrypt
 
+				echo $password;
 				//Encrypting evaluation key 
-				$encrypted_photo_key = openssl_encrypt($password_evaluation, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag, "", $tag_length);
-				$encrypted_photo_key = base64_encode($iv.$encrypted_photo_key.$tag);
-
+				if (!openssl_public_encrypt($password_evaluation, $encrypted_photo_key, $password))
+				{
+					throw new Exception(openssl_error_string());
+				}
+				echo $encrypted_photo_key;
 				$stmt->bind_param('iis', $evaluation_id, $row['id'], $encrypted_photo_key);
 				$stmt->execute();
 				$stmt->close();

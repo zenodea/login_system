@@ -24,11 +24,11 @@ if (mysqli_connect_errno())
 }
 
 // Prepare statement to check if user is admin
-if ($stmt = $con->prepare('SELECT admin FROM accounts WHERE id = ?'))
+if ($stmt = $con->prepare('SELECT admin, id, public_key FROM accounts WHERE id = ?'))
 {
 	$stmt->bind_param('i',$_SESSION['id']);
 	$stmt->execute();
-	$stmt->bind_result($admin);
+	$stmt->bind_result($admin, $user_id, $public_key);
 	$stmt->fetch();
 	$stmt->close();
 	if ($admin == 0)
@@ -41,29 +41,81 @@ if ($stmt = $con->prepare('SELECT admin FROM accounts WHERE id = ?'))
 	}
 	else
 	{
-		$query = "SELECT id, id_user, header, comment, url, contact FROM evaluations";
-		$result = $con->query($query);
 
-		$sql = "SELECT p_key FROM admin_key WHERE id = 13";
-		$new_result = $con->query($sql);	
-
-		foreach ($new_result as $key => $value) 
+		if ($stmt = $con->prepare("SELECT p_key FROM admin_key WHERE id = ?"))
 		{
-			 $admin_id = $key; 
-    	}
-		$textToDecrypt = $admin_id;
-		$encrypted = base64_decode($textToDecrypt);
-		$iv = substr($encrypted, 0, $iv_len);
-		$ciphertext = substr($encrypted, $iv_len, -$tag_length);
-		$tag = substr($encrypted, -$tag_length);
-		$private_key = openssl_decrypt($ciphertext, $cipher, $_SESSION['password'], OPENSSL_RAW_DATA, $iv, $tag);
+			$stmt->bind_param('i',$user_id);
+			$stmt->execute();
+			$stmt->bind_result($p_key);
+			$stmt->fetch();
+			$stmt->close();
 
-		foreach ($result as $key => $value) 
-		{
 
-			openssl_private_decrypt($value,$result[$key],$private_key);
-			  
-    	}
+			// Get and decrypt private key for admin
+			$password = $_SESSION['password'];
+			$key = substr(hash('sha256', $password, true), 0, 32);
+			$cipher = 'aes-256-gcm';
+			$iv_len = openssl_cipher_iv_length($cipher);
+			$tag_length = 16;
+			
+			$textToDecrypt = $p_key;
+			$encrypted = base64_decode($textToDecrypt);
+			$iv = substr($encrypted, 0, $iv_len);
+			$ciphertext = substr($encrypted, $iv_len, -$tag_length);
+			$tag = substr($encrypted, -$tag_length);
+			$private_key = openssl_decrypt($ciphertext, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag);
+			echo $_SESSION['password'];
+
+			$query = "SELECT id, id_user, header, comment, url, contact FROM evaluations";
+			$result = $con->query($query);
+			while ($row = $result->fetch_assoc()) 
+			{
+				if ($stmt = $con->prepare('SELECT document_cipher FROM document_key WHERE id_evaluation = ? AND id_user = ?'))
+				{
+					$stmt->bind_param('ii',$row['id'],$user_id);
+					$stmt->execute();
+					$stmt->bind_result($curr_cipher);
+					$stmt->fetch();
+					$stmt->close();
+					if (!openssl_private_decrypt($curr_cipher, $decrypted_curr_cipher, $private_key))
+					{
+						throw new Exception(openssl_error_string());
+    				}
+					echo $decrypted_curr_cipher;
+				}
+				// Preparing decryption items
+				$password = $decrypted_curr_cipher;
+				$key = substr(hash('sha256', $password, true), 0, 32);
+				$cipher = 'aes-256-gcm';
+				$iv_len = openssl_cipher_iv_length($cipher);
+				$tag_length = 16;
+
+				// header to decrypt
+				$textToDecrypt = $row['header'];
+				$encrypted = base64_decode($textToDecrypt);
+				$iv = substr($encrypted, 0, $iv_len);
+				$ciphertext = substr($encrypted, $iv_len, -$tag_length);
+				$tag = substr($encrypted, -$tag_length);
+				$email = openssl_decrypt($ciphertext, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag);
+
+				// comment to decrypt
+				$textToDecrypt = $row['comment'];
+				$encrypted = base64_decode($textToDecrypt);
+				$iv = substr($encrypted, 0, $iv_len);
+				$ciphertext = substr($encrypted, $iv_len, -$tag_length);
+				$tag = substr($encrypted, -$tag_length);
+				$comment = openssl_decrypt($ciphertext, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag);
+				echo $comment;
+
+				// contact to decrypt
+				$textToDecrypt = $row['contact'];
+				$encrypted = base64_decode($textToDecrypt);
+				$iv = substr($encrypted, 0, $iv_len);
+				$ciphertext = substr($encrypted, $iv_len, -$tag_length);
+				$tag = substr($encrypted, -$tag_length);
+				$contact = openssl_decrypt($ciphertext, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag);
+			}
+		}
 	}
 }
 
