@@ -182,6 +182,17 @@ if ($stmt = $con->prepare('SELECT id FROM 2fa WHERE id = ?'))
 			<input type=hidden value="phone" name="value" />
 			<input type="submit" value="Change Phone" />
 		</form>
+		<?php
+		if ($admin == "True")
+		{
+			?>
+				<form action="make_admin_html.php" method="POST">
+					<input type=hidden value="phone" name="value" />
+					<input type="submit" />
+				</form>
+			<?php
+		}
+		?>
 			</div>
 		</div>
 	</body>

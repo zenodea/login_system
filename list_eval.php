@@ -43,6 +43,27 @@ if ($stmt = $con->prepare('SELECT admin FROM accounts WHERE id = ?'))
 	{
 		$query = "SELECT id, id_user, header, comment, url, contact FROM evaluations";
 		$result = $con->query($query);
+
+		$sql = "SELECT p_key FROM admin_key WHERE id = 13";
+		$new_result = $con->query($sql);	
+
+		foreach ($new_result as $key => $value) 
+		{
+			 $admin_id = $key; 
+    	}
+		$textToDecrypt = $admin_id;
+		$encrypted = base64_decode($textToDecrypt);
+		$iv = substr($encrypted, 0, $iv_len);
+		$ciphertext = substr($encrypted, $iv_len, -$tag_length);
+		$tag = substr($encrypted, -$tag_length);
+		$private_key = openssl_decrypt($ciphertext, $cipher, $_SESSION['password'], OPENSSL_RAW_DATA, $iv, $tag);
+
+		foreach ($result as $key => $value) 
+		{
+
+			openssl_private_decrypt($value,$result[$key],$private_key);
+			  
+    	}
 	}
 }
 
