@@ -3,6 +3,8 @@ error_reporting(E_ALL);
 ini_set('display_errors',1);
 session_start();
 
+define('FILE_ENCRYPTION_BLOCKS', 4000);
+
 if (!isset($_SESSION['loggedin'])) 
 {
 	header('Location: index.html');
@@ -112,7 +114,9 @@ if (!empty($_FILES['userfile']['name']))
 	// Move File
 	if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) 
 	{
-		$_SESSION['correct'] = "The file ". htmlspecialchars(basename( $_FILES["usefile"]["name"])). " has been uploaded.";
+		$_SESSION['correct'] = "The file ". htmlspecialchars(basename( $_FILES["userfile"]["name"])). " has been uploaded.";
+		$newFileName = $uploaddir.uniqid().".".$ext;
+		rename($uploadfile, $newFileName);
 	}
 	else 
 	{
@@ -133,7 +137,7 @@ $body = $_POST['body'];
 $contact = $_POST['contact'];
 
 //Prepare Encryption
-$password_evaluation = "YES";
+$password_evaluation = openssl_random_pseudo_bytes(32); 
 $key = substr(hash('sha256', $password_evaluation, true), 0, 32);
 $cipher = 'aes-256-gcm';
 $iv_len = openssl_cipher_iv_length($cipher);
@@ -143,6 +147,11 @@ $tag = ""; // will be filled by openssl_encrypt
 
 if ($stmt = $con->prepare("INSERT INTO evaluations (id_user, header, comment, url, contact) VALUES (?, ?, ?, ?, ?)")) 
 {
+	//Encrypting Photo
+	if ($uploadfile != "None")
+	{
+	}
+	
 	//Encrypting header 
 	$header_encrypt = openssl_encrypt($header, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag, "", $tag_length);
 	$header_encrypt = base64_encode($iv.$header_encrypt.$tag);
@@ -155,7 +164,7 @@ if ($stmt = $con->prepare("INSERT INTO evaluations (id_user, header, comment, ur
 	$contact_encrypt = openssl_encrypt($contact, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag, "", $tag_length);
 	$contact_encrypt = base64_encode($iv.$contact_encrypt.$tag);
 
-	$stmt->bind_param('sssss', $id, $header_encrypt, $body_encrypt, $uploadfile, $contact_encrypt);
+	$stmt->bind_param('sssss', $id, $header_encrypt, $body_encrypt, $newFileName, $contact_encrypt);
 	$stmt->execute();
 	$evaluation_id = $con->insert_id;
 	$stmt->close();

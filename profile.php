@@ -187,8 +187,8 @@ if ($stmt = $con->prepare('SELECT id FROM 2fa WHERE id = ?'))
 		{
 			?>
 				<form action="make_admin_html.php" method="POST">
-					<input type=hidden value="phone" name="value" />
-					<input type="submit" />
+					<br>
+					<input type="submit"  value="Make admin"/>
 				</form>
 			<?php
 		}

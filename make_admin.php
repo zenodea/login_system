@@ -3,6 +3,45 @@ error_reporting(E_ALL);
 ini_set('display_errors',1);
 session_start();
 
+// If the user is not logged in redirect to the login page...
+if (!isset($_SESSION['loggedin'])) 
+{
+	header('Location: index.html');
+	exit;
+}
+
+//CSRF token check (and time check)
+if(isset($_POST) & !empty($_POST))
+{
+	if(isset($_POST['csrf_token']))
+	{
+		if($_POST['csrf_token'] == $_SESSION['csrf_token'])
+		{
+		}
+		else
+		{
+			$_SESSION['error'] = 'Token Error, try again!';
+			session_unset();
+			header('Location: register.php');
+			exit();
+		}
+	}
+	$maximum_time = 600;
+	if (isset($_SESSION['csrf_token_time']))
+	{
+		$token_time = $_SESSION['csrf_token_time'];
+		if(($token_time + $maximum_time) <= time())
+		{
+			unset($_SESSION['csrf_token_time']);
+			unset($_SESSION['csrf_token']);
+			$_SESSION['error'] = 'Token Expired, try again!';
+			session_unset();
+			header('Location: register.php');
+			exit();
+		}
+	}
+}
+
 // Change this to your connection info.
 $configs = include('config/config.php');
 $DATABASE_HOST = $configs['host'];
@@ -19,16 +58,22 @@ if ( mysqli_connect_errno() )
 }
 
 // Check password is correct
-if ($stmt = $con->prepare('SELECT id, pass FROM accounts WHERE username = ?')) 
+if ($stmt = $con->prepare('SELECT id, admin FROM accounts WHERE username = ?')) 
 {
 	$stmt->bind_param('s', $_POST['username']);
 	$stmt->execute();
 	// Store the result so we can check if the account exists in the database.
 	$stmt->store_result();
 	if ($stmt->num_rows > 0) {
-        $stmt->bind_result($id, $password);
+        $stmt->bind_result($id, $admin);
         $stmt->fetch();
         $stmt->close();
+        if ($admin == 1)
+        {
+            $_SESSION["error"] = "User is already an admin!";	
+            header('Location: make_admin_html.php');
+            exit();
+        }
         if (!password_verify($_POST['password'], $password)) 
         {
             $_SESSION["error"] = "Password is Wrong!";	

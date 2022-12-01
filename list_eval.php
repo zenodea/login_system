@@ -1,6 +1,4 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors',1);
 session_start();
 
 if (!isset($_SESSION['loggedin'])) 
@@ -64,57 +62,9 @@ if ($stmt = $con->prepare('SELECT admin, id, public_key FROM accounts WHERE id =
 			$ciphertext = substr($encrypted, $iv_len, -$tag_length);
 			$tag = substr($encrypted, -$tag_length);
 			$private_key = openssl_decrypt($ciphertext, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag);
-			echo $p_key;
 
 			$query = "SELECT id, id_user, header, comment, url, contact FROM evaluations";
 			$result = $con->query($query);
-			while ($row = $result->fetch_assoc()) 
-			{
-				if ($stmt = $con->prepare('SELECT document_cipher FROM document_key WHERE id_evaluation = ? AND id_user = ?'))
-				{
-					$stmt->bind_param('ii',$row['id'],$user_id);
-					$stmt->execute();
-					$stmt->bind_result($curr_cipher);
-					$stmt->fetch();
-					$stmt->close();
-					if (!openssl_private_decrypt($curr_cipher, $decrypted_curr_cipher, $private_key))
-					{
-						throw new Exception(openssl_error_string());
-    				}
-					echo $decrypted_curr_cipher;
-				}
-				// Preparing decryption items
-				$password = $decrypted_curr_cipher;
-				$key = substr(hash('sha256', $password, true), 0, 32);
-				$cipher = 'aes-256-gcm';
-				$iv_len = openssl_cipher_iv_length($cipher);
-				$tag_length = 16;
-
-				// header to decrypt
-				$textToDecrypt = $row['header'];
-				$encrypted = base64_decode($textToDecrypt);
-				$iv = substr($encrypted, 0, $iv_len);
-				$ciphertext = substr($encrypted, $iv_len, -$tag_length);
-				$tag = substr($encrypted, -$tag_length);
-				$email = openssl_decrypt($ciphertext, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag);
-
-				// comment to decrypt
-				$textToDecrypt = $row['comment'];
-				$encrypted = base64_decode($textToDecrypt);
-				$iv = substr($encrypted, 0, $iv_len);
-				$ciphertext = substr($encrypted, $iv_len, -$tag_length);
-				$tag = substr($encrypted, -$tag_length);
-				$comment = openssl_decrypt($ciphertext, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag);
-				echo $comment;
-
-				// contact to decrypt
-				$textToDecrypt = $row['contact'];
-				$encrypted = base64_decode($textToDecrypt);
-				$iv = substr($encrypted, 0, $iv_len);
-				$ciphertext = substr($encrypted, $iv_len, -$tag_length);
-				$tag = substr($encrypted, -$tag_length);
-				$contact = openssl_decrypt($ciphertext, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag);
-			}
 		}
 	}
 }
@@ -227,32 +177,79 @@ if ($stmt = $con->prepare('SELECT admin, id, public_key FROM accounts WHERE id =
 						<th>Contact</th>
 						<th>Resolved</th>
 					</tr>
-					<?php foreach ($result as $row): array_map('htmlentities', $row); ?>
-					<tr>
-					<td><?php echo $row['id_user'];?></td>
-					<td><?php echo $row['header'];?></td>
-					<td><?php echo $row['comment'];?></td>
-					<?php 
-						if ($row['url'] == "None")
+			<?php 
+				while ($row = $result->fetch_assoc()) 
+				{
+					if ($stmt = $con->prepare('SELECT document_cipher FROM document_key WHERE id_evaluation = ? AND id_user = ?'))
+					{
+						$stmt->bind_param('ii',$row['id'],$user_id);
+						$stmt->execute();
+						$stmt->bind_result($curr_cipher);
+						$stmt->fetch();
+						$stmt->close();
+						if (!openssl_private_decrypt($curr_cipher, $decrypted_curr_cipher, $private_key))
 						{
-							?>
-							<td><?php echo "None";?></td>
-							<td> 
-							<?php
+							$error = array();
+							array_push($error, "Error with administration key, please contact a supervisor!");
+							$_SESSION['error'] = $error;
+							header('Location: profile.php');
+							exit();
 						}
-						else
-						{
-							?>
-						<form action="show_image.php" method="POST">
-							<input type="hidden" name="description" value=<?php echo $row['header'];?> id="description" hidden>
-							<input type="hidden" name="image" value=<?php echo $row['url'];?> id="image" hidden>
-							<td><input type="submit" value="See Picture" id="see_pic"></td>
-						</form>
-							<td> 
-							<?php
-						}
+					}
+					// Preparing decryption items
+					$password = $decrypted_curr_cipher;
+					$key = substr(hash('sha256', $password, true), 0, 32);
+					$cipher = 'aes-256-gcm';
+					$iv_len = openssl_cipher_iv_length($cipher);
+					$tag_length = 16;
+
+					?><td><?php echo $row['id_user'];?></td><?php
+					// header to decrypt
+					$textToDecrypt = $row['header'];
+					$encrypted = base64_decode($textToDecrypt);
+					$iv = substr($encrypted, 0, $iv_len);
+					$ciphertext = substr($encrypted, $iv_len, -$tag_length);
+					$tag = substr($encrypted, -$tag_length);
+					$email = openssl_decrypt($ciphertext, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag);
+					?><td><?php echo $email;?></td><?php
+
+					// comment to decrypt
+					$textToDecrypt = $row['comment'];
+					$encrypted = base64_decode($textToDecrypt);
+					$iv = substr($encrypted, 0, $iv_len);
+					$ciphertext = substr($encrypted, $iv_len, -$tag_length);
+					$tag = substr($encrypted, -$tag_length);
+					$comment = openssl_decrypt($ciphertext, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag);
+					?><td><?php echo $comment;?></td><?php
+
+					// contact to decrypt
+					$textToDecrypt = $row['contact'];
+					$encrypted = base64_decode($textToDecrypt);
+					$iv = substr($encrypted, 0, $iv_len);
+					$ciphertext = substr($encrypted, $iv_len, -$tag_length);
+					$tag = substr($encrypted, -$tag_length);
+					$contact = openssl_decrypt($ciphertext, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag);
+					if ($row['url'] == "None")
+					{
 						?>
-					<input type="submit" value=<?php echo $row['contact'];?> id="contact"/>
+						<td><?php echo "None";?></td>
+						<td> 
+						<?php
+					}
+					else
+					{
+						?>
+					<form action="show_image.php" method="POST">
+						<input type="hidden" name="description" value=<?php echo $email;?> id="description" hidden>
+						<input type="hidden" name="key" value=<?php echo $decrypted_curr_cipher;?> id="what" hidden>
+						<input type="hidden" name="image" value=<?php echo $row['url'];?> id="image" hidden>
+						<td><input type="submit" value="See Picture" id="see_pic"></td>
+					</form>
+						<td> 
+						<?php
+					}
+					?>
+					<input type="submit" value=<?php echo $contact;?> id="contact"/>
 						<td>
 					<form action="remove_eval.php" method="POST">
 						<input type="hidden" name="remove" value=<?php echo $row['id'];?> id="remove" />
@@ -260,7 +257,7 @@ if ($stmt = $con->prepare('SELECT admin, id, public_key FROM accounts WHERE id =
 					</form>
 					</td>
 					</tr>
-					<?php endforeach; ?>
+					<?php } ?>
 				</table><br>
 			</div>
 		</div>

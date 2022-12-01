@@ -7,7 +7,8 @@
   - Phone Number
 - All the values of the account (with the exception of the username) are changable.
 - All User data is stored in a database (MySQL)
-- All data store is encrypted with AES, and only visible to user.
+- All the sensitive data the user provides are stored encrypted (email, phone number, password)
+  - Specifically the email and phone number, they are stored via a symmetrical encryption method. This method utilises the password of the user as its key. This allows the information of the user to be only visible by them.
 - XSS secure.
 - CSRF secure.
 - SQLi secure.
@@ -22,6 +23,7 @@
 - Captcha added for login page. (Botnet Attack)
 - Number of attempts added.
   - If a user tries to enter into an account more than three times, the ip is stored in database and they will have to wait for 10 minutes.
+  - Once the 10 minutes are passed, when the user tries to insert a password again, the ip is removed from the database, and the user has three more chances.
 - XSS secure.
 - CSRF secure.
 - SQLi secure.
@@ -44,6 +46,7 @@
 - Users can send evaluations, consisting of: Title of evaluation, Comment of evaluation.
 - Drop down box included to select best choice of contact (email or phone number).
 - The data is then encrypted, and only administrators will be able to view the encrypted content.
+  - This is done via creating a public/private key for every administrator. All sensitive information in the evaluation (contact method, body of evaluation, pictures) are encrypted via a symmetric encryption. The key used to encrypt the data is then encrypted with the public key of all admins (thus if there are 5 admins, 5 sets of the keys, with different encryptions, are stored in the database). The private key is also stored in the database, but it is encrypted with the password of the admin's account. The public key is stored as is. When a admin wishes to view the list of evaluations, the private key is decrypted with the admin password, the private key is used to decrypt the key for the evaluation, and the decrypted key is used to decrypt the evaluation. This creates a secure system which allows multiple admins to see the same information, while mainting a level of security.
 - XSS secure.
 - CSRF secure.
 - SQLi secure.
@@ -51,7 +54,8 @@
 ### Photo Upload for Evaluations
 - Alongside the title and comment, of an evaluation, a photo file can also be uploaded.
 - The file is stored in the server, and the url to the file is stored in a database.
-- The file itself is encrypted, and is decrypted when viewing is requested.
+- File name is changed to random values. 
+- The files themselves are encrypted. The encryption follows the scheme that has been explained earlier.
 - XSS secure.
 - CSRF secure.
 - SQLi secure.
@@ -59,7 +63,9 @@
 ### Administrator Role
 - Administration roles are added to the website.
 - Administators are able to view a list of evaluations.
-- From the list of evaluations, they are able to contact the user who sent the request, or delete the request.
+- Administrators have the ability to give the role of administrator to other users in the database.
+  - Giving another user the administrator role will create a public/private key for the selected user.
+- From the list of evaluations, they are able to see the preferred method of, or delete the request.
 - They are also able to see all the information of an evaluation (title, comment, photo).
 - XSS secure.
 - CSRF secure.

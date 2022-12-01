@@ -1,4 +1,6 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors',1);
 session_start();
 
 // If the user is not logged in redirect to the login page...
@@ -11,7 +13,6 @@ if (!isset($_SESSION['loggedin']))
 $token =  bin2hex(random_bytes(32));
 $_SESSION['csrf_token'] = $token;
 $_SESSION['csrf_token_time'] = time();
-
 ?>
 
 <!DOCTYPE html>
@@ -100,7 +101,7 @@ $_SESSION['csrf_token_time'] = time();
 	<body class="loggedin">
 		<div class="content">
 			<h2>Evaluation: <?php echo $_POST['description'];?> Picture</h2>
-			 <img src=<?php echo $_POST['image'];?> class="center"> 
+			 <img src=<?php echo $_POST['image']?> class="center"> 
 			<form action="list_eval.php" method="POST">
 				<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
 				<input class="button" name="Go Back" value="Go Back" type="submit" id="contact"/>
