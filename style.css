@@ -31,7 +31,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 50px;
+    width: 80px;
     height: 50px;
     background-color: #2f3947;
     color: #ffffff;
@@ -81,7 +81,7 @@ body {
 	background-color: #2f3947;
 	height: 60px;
 	width: 100%;
-	border: 0;
+	border: 1;
 }
 .navtop div {
 	display: flex;
@@ -97,7 +97,7 @@ body {
 	flex: 1;
 	font-size: 24px;
 	padding: 0;
-	margin: 0;
+	margin: 1;
 	color: #eaebed;
 	font-weight: normal;
 }
@@ -171,8 +171,8 @@ body.loggedin {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 50px;
-   height: 50px;
+    width: 150px;
+    height: 200px;
     background-color: #2f3947;
     color: #ffffff;
 }
@@ -209,3 +209,234 @@ table {
     padding-left: 30px;
     padding-right: 40px;
   }
+
+			.loggedin.listeval select{
+				text-align-last:right;
+				padding-right: 29px;
+				direction: rtl;
+				width:120px;   
+
+			}
+			.loggedin.listeval td {
+				word-break: break-all;
+				word-break: break-word;
+			}
+			.loggedin.listeval #list{
+					font-size: 10px;
+					text-align: center;
+					font-weight: bold;
+					appearance:listbox;
+					width: 100%;
+					background-color: #90EE90;
+					border: 1;
+					border-color: black;
+			}
+			.loggedin.listeval #see_pic{
+					width: 100%;
+					background-color: #90EE90;
+					border: 0;
+					cursor: pointer;
+					font-weight: bold;
+					transition: background-color 0.2s;
+			}
+			.loggedin.listeval #remove{
+					width: 100%;
+					background-color: #ff6961;
+					border: 0;
+					cursor: pointer;
+					font-weight: bold;
+					transition: background-color 0.2s;
+			}
+			.loggedin.listeval #contact{
+					width: 100%;
+					background-color: #FFD580;
+					border: 0;
+					cursor: pointer;
+					font-weight: bold;
+					transition: background-color 0.2s;
+			}
+			.loggedin.listeval table {
+				border-collapse: collapse;
+			}
+			.loggedin.listeval th {
+				border: 1px solid back;
+				padding-left: 50px;
+				padding-right: 50px;
+			}
+			.loggedin.listeval td {
+				padding: 10px;
+				border: 1px solid;
+			}
+			.loggedin.listeval tr:nth-child(even) {
+				background-color: #D6EEEE;
+			}
+
+			.loggedin.showimage select {
+				text-align-last:right;
+				padding-right: 29px;
+				direction: rtl;
+				width:120px;   
+
+			}
+			.loggedin.showimage td {
+				word-break: break-all;
+				word-break: break-word;
+			}
+			.loggedin.showimage .center {
+			display: block;
+			margin-left: auto;
+			margin-right: auto;
+			padding-top: 30px;
+			padding-bottom: 30px;
+			width: 50%;
+			}
+			.loggedin.showimage #list {
+				font-size: 10px;
+				text-align: center;
+				font-weight: bold;
+				appearance:listbox;
+				width: 100%;
+				background-color: #90EE90;
+				border: 1;
+				border-color: black;
+		    }
+			.loggedin.showimage #remove {
+				width: 100%;
+				background-color: #ff6961;
+				border: 0;
+				cursor: pointer;
+				font-weight: bold;
+				transition: background-color 0.2s;
+		    }
+			.loggedin.showimage #contact {
+				width: 20%;
+				background-color: #FFD580;
+				border: 1;
+				cursor: pointer;
+				font-weight: bold;
+				transition: background-color 0.2s;
+			}
+			.loggedin.showimage table {
+			border-collapse: collapse;
+			}
+			.loggedin.showimage th {
+			border: 1px solid back;
+			padding-left: 50px;
+			padding-right: 50px;
+			}
+			.loggedin.showimage td {
+			padding: 10px;
+			border: 1px solid;
+			}
+		.loggedin.showimage tr:nth-child(even) {
+			background-color: #D6EEEE;
+			}
+
+			.loggedin.reqeval select {
+				display: inline-block;
+				width: 310px;
+				height: 50px;
+				border: 1px solid #dee0e4;
+				margin-top: 20px;
+				margin-bottom: 20px;
+			}
+			.loggedin.reqeval form {
+				text-align: center;
+				align-items: center;
+				flex-wrap: wrap;
+				justify-content: center;
+				padding-top: 20px;
+			}
+			.loggedin.reqeval form label {
+				display: inline-block;
+				vertical-align: middle;
+				text-align: center;
+				justify-content: center;
+				align-items: center;
+				width: 200px;
+				height: 50px;
+				font-weight: bold;
+				background-color: #435165;
+				color: #ffffff;
+			}
+			.loggedin.reqeval form input[type="password"], .register form input[type="text"], .register form input[type="email"] {
+				text-align: center;
+				width: 310px;
+				height: 50px;
+				border: 1px solid #dee0e4;
+				margin-top: 20px;
+				margin-bottom: 20px;
+				font-weight: bold;
+			}
+			.loggedin.reqeval form input[type="submit"] {
+				display: inline-block;
+				text-align: center;
+				width: 100%;
+				padding: 15px;
+				margin-top: 20px;
+				background-color: #435165;
+				border: 0;
+				cursor: pointer;
+				font-weight: bold;
+				color: #ffffff;
+				transition: background-color 0.2s;
+			}
+			.loggedin.reqeval form input[type="submit"]:hover {
+			background-color: #435165;
+				transition: background-color 0.2s;
+			}
+			.loggedin.reqeval .text-center {
+			text-align: center;
+			}
+			.loggedin.reqeval .g-recaptcha {
+			padding: 30px;
+			display: inline-block;
+            }
+			.loggedin.changeprof form {
+				text-align: center;
+				align-items: center;
+				flex-wrap: wrap;
+				justify-content: center;
+				padding-top: 20px;
+			}
+			.loggedin.changeprof form label 
+			{
+				display: inline-block;
+				vertical-align: middle;
+				text-align: center;
+				justify-content: center;
+				align-items: center;
+				width: 200px;
+				height: 50px;
+				font-weight: bold;
+				background-color: #435165;
+				color: #ffffff;
+			}
+			.loggedin.changeprof form input[type="submit"] {
+				display: inline-block;
+				text-align: center;
+				width: 100%;
+				padding: 15px;
+				margin-top: 20px;
+				background-color: #435165;
+				border: 0;
+				cursor: pointer;
+				font-weight: bold;
+				color: #ffffff;
+				transition: background-color 0.2s;
+			}
+			.loggedin.changeprof form input[type="submit"]:hover {
+			background-color: #435165;
+				transition: background-color 0.2s;
+			}
+			.security_questions.login select {
+				display: inline-block;
+				width: 310px;
+				height: 50px;
+				border: 1px solid #dee0e4;
+				margin-top: 20px;
+				margin-bottom: 20px;
+			}
+
+			.loggedin.fa div{ text-align: center;}
+			

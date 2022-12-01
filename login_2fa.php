@@ -19,14 +19,13 @@ if ( mysqli_connect_errno() )
 	// If there is an error with the connection, stop the script and display the error.
 	exit('Failed to connect to MySQL: ' . mysqli_connect_error());
 }
-$sql = "SELECT secret FROM 2fa WHERE id = ".$_SESSION['id'];
-$result = $con->query($sql);
-if (mysqli_num_rows($result) > 0) 
+if ($stmt = $con->prepare("SELECT secret FROM 2fa WHERE id =?"))
 {
-    while($row = mysqli_fetch_assoc($result)) 
-    {
-        $secret = $row['secret'];
-    }
+    $stmt->bind_param('i', $_SESSION['id']);
+	$stmt->execute();
+	$stmt->bind_result($secret_encrypted);
+	$stmt->fetch();
+	$stmt->close();
 }
 
 // Preparing decryption items
@@ -37,7 +36,7 @@ $iv_len = openssl_cipher_iv_length($cipher);
 $tag_length = 16;
 
 // 2FA to decrypt
-$textToDecrypt = $secret;
+$textToDecrypt = $secret_encrypted;
 $encrypted = base64_decode($textToDecrypt);
 $iv = substr($encrypted, 0, $iv_len);
 $ciphertext = substr($encrypted, $iv_len, -$tag_length);
@@ -54,7 +53,7 @@ if ($tfa->verifyCode($secret, $_POST['2fa']) === true)
 }
 else
 {
-    $_SESSION['error'] = "Wrong PIN, try again!";
+    $_SESSION['error'] = $secret_encrypted;
     header('Location: login_2fa_html.php');
     exit();
 }

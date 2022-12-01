@@ -54,52 +54,33 @@ $_SESSION['csrf_token_time'] = time();
 <!DOCTYPE html>
 <html>
 	<head>
-		<meta charset="utf-8">
+		<meta
+			http-equiv="Content-Security-Policy"
+			content="default-src 'none'; 
+					script-src 
+							'self' 
+							https://apis.google.comhttps://apis.google.com 
+							https://www.google.com/recaptcha/ 
+							https://www.gstatic.com/recaptcha/;
+					style-src 
+							'self' 
+							https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css 
+							https://fonts.googleapis.com 
+							https://www.google.com/recaptcha/ 
+							https://www.gstatic.com/recaptcha/;
+					form-action 'self';
+					img-src 'self' www.gstatic.com;
+					frame-src 'self' https://www.google.com/recaptcha/;
+					object-src 'self' 'none';
+					base-uri 'self' 'none';" 
+  		/>
+
 		<title>Profile Page</title>
 		<link href="style.css" rel="stylesheet" type="text/css">
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-        <style>
-			form {
-				text-align: center;
-				align-items: center;
-				flex-wrap: wrap;
-				justify-content: center;
-				padding-top: 20px;
-			}
-			form label 
-			{
-				display: inline-block;
-				vertical-align: middle;
-				text-align: center;
-				justify-content: center;
-				align-items: center;
-				width: 200px;
-				height: 50px;
-				font-weight: bold;
-				background-color: #435165;
-				color: #ffffff;
-			}
-			form input[type="submit"] {
-				display: inline-block;
-				text-align: center;
-				width: 100%;
-				padding: 15px;
-				margin-top: 20px;
-				background-color: #435165;
-				border: 0;
-				cursor: pointer;
-				font-weight: bold;
-				color: #ffffff;
-				transition: background-color 0.2s;
-			}
-			form input[type="submit"]:hover {
-			background-color: #435165;
-				transition: background-color 0.2s;
-			}
-        </style>
 	</head>
-	<body class="loggedin">
+	<body class="loggedin changeprof">
 		<nav class="navtop">
 			<div>
 				<h1>Love Joy</h1>

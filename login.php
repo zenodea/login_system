@@ -14,12 +14,34 @@ $_SESSION['csrf_token_time'] = time();
 <!DOCTYPE html>
 <html>
 	<head>
-		<meta charset="utf-8">
+		<!--Setting up CSP-->
+		<meta
+			http-equiv="Content-Security-Policy"
+			content="default-src 'self'; 
+					script-src 
+							'self' 
+							https://apis.google.comhttps://apis.google.com 
+							https://www.google.com/recaptcha/ 
+							https://www.gstatic.com/recaptcha/;
+					style-src 
+							'self' 
+							https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css 
+							https://use.fontawesome.com/releases/v5.7.1/css/all.css
+							https://fonts.googleapis.com 
+							https://www.google.com/recaptcha/ 
+							https://www.gstatic.com/recaptcha/;
+					form-action 'self';
+					img-src 'self' www.gstatic.com;
+					frame-src 'self' https://www.google.com/recaptcha/;
+					object-src 'self' 'none';
+					base-uri 'self' 'none';" 
+  		/>
 		<title>Login</title>
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
-		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+		<link rel="stylesheet" href='https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css'>
 		<link href="style.css" rel="stylesheet" type="text/css">
-		<script src='https://www.google.com/recaptcha/api.js' async defer></script>
+		<script src='https://www.google.com/recaptcha/api.js' nonce="{NONCE}"></script>
+		
 	</head>
 	<body>
 		<div class="login">
@@ -40,11 +62,11 @@ $_SESSION['csrf_token_time'] = time();
 			<form  action="authenticate.php"  method="POST" required>
 				<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
 				<label for="username">
-					<i class="fas fa-user"></i>
+					Username
 				</label>
 				<input type="text" name="username" placeholder="Username" id="username">
 				<label for="password">
-					<i class="fas fa-lock"></i>
+					Password
 				</label>
 				<input type="password" name="password" placeholder="Password" id="password">
 				<br>

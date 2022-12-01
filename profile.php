@@ -89,10 +89,29 @@ if ($stmt = $con->prepare('SELECT id FROM 2fa WHERE id = ?'))
 <!DOCTYPE html>
 <html>
 	<head>
-		<meta charset="utf-8">
+		<meta
+			http-equiv="Content-Security-Policy"
+			content="default-src 'none'; 
+					script-src 
+							'self' 
+							https://apis.google.comhttps://apis.google.com 
+							https://www.google.com/recaptcha/ 
+							https://www.gstatic.com/recaptcha/;
+					style-src 
+							'self' 
+							https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css 
+							https://fonts.googleapis.com 
+							https://www.google.com/recaptcha/ 
+							https://www.gstatic.com/recaptcha/;
+					form-action 'self';
+					img-src 'self' www.gstatic.com;
+					frame-src 'self' https://www.google.com/recaptcha/;
+					object-src 'self' 'none';
+					base-uri 'self' 'none';" 
+  		/>
 		<title>Profile Page</title>
 		<link href="style.css" rel="stylesheet" type="text/css">
-		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
 	</head>
 	<body class="loggedin">
@@ -168,17 +187,17 @@ if ($stmt = $con->prepare('SELECT id FROM 2fa WHERE id = ?'))
 				}
 			?>
 		<br>
-		<form action="change_profile_item_html.php" method="POST">
+		<form action="change_profile_item_html.php" method="POST"  class="signup-form">
 			<input type=hidden value="password" name="value" />
 			<input type="submit" value="Change Password" />
 		</form>
 		<br>
-		<form action="change_profile_item_html.php" method="POST">
+		<form action="change_profile_item_html.php" method="POST"  class="signup-form">
 			<input type=hidden value="email" name="value" />
 			<input type="submit" value="Change Email" />
 		</form>
 		<br>
-		<form action="change_profile_item_html.php" method="POST">
+		<form action="change_profile_item_html.php" method="POST" class="signup-form">
 			<input type=hidden value="phone" name="value" />
 			<input type="submit" value="Change Phone" />
 		</form>

@@ -38,70 +38,27 @@ $_SESSION['csrf_token_time'] = time();
 <!DOCTYPE html>
 <html>
 	<head>
+		<meta
+			http-equiv="Content-Security-Policy"
+			content="default-src 'none'; 
+					script-src 
+							'self' 
+							https://apis.google.comhttps://apis.google.com 
+							https://www.google.com/recaptcha/ 
+							https://www.gstatic.com/recaptcha/;
+					style-src 
+							'self' 
+							https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css 
+							https://fonts.googleapis.com 
+							https://www.google.com/recaptcha/ 
+							https://www.gstatic.com/recaptcha/;
+					form-action 'self';
+					img-src 'self' www.gstatic.com;
+					frame-src 'self' https://www.google.com/recaptcha/;
+					object-src 'self' 'none';
+					base-uri 'self' 'none';" 
+  		/>
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-		<style>
-			select {
-				display: inline-block;
-				width: 310px;
-				height: 50px;
-				border: 1px solid #dee0e4;
-				margin-top: 20px;
-				margin-bottom: 20px;
-			}
-			form {
-				text-align: center;
-				align-items: center;
-				flex-wrap: wrap;
-				justify-content: center;
-				padding-top: 20px;
-			}
-			form label {
-				display: inline-block;
-				vertical-align: middle;
-				text-align: center;
-				justify-content: center;
-				align-items: center;
-				width: 200px;
-				height: 50px;
-				font-weight: bold;
-				background-color: #435165;
-				color: #ffffff;
-			}
-			form input[type="password"], .register form input[type="text"], .register form input[type="email"] {
-				text-align: center;
-				width: 310px;
-				height: 50px;
-				border: 1px solid #dee0e4;
-				margin-top: 20px;
-				margin-bottom: 20px;
-				font-weight: bold;
-			}
-			form input[type="submit"] {
-				display: inline-block;
-				text-align: center;
-				width: 100%;
-				padding: 15px;
-				margin-top: 20px;
-				background-color: #435165;
-				border: 0;
-				cursor: pointer;
-				font-weight: bold;
-				color: #ffffff;
-				transition: background-color 0.2s;
-			}
-			form input[type="submit"]:hover {
-			background-color: #435165;
-				transition: background-color 0.2s;
-			}
-			.text-center {
-			text-align: center;
-			}
-			.g-recaptcha {
-			padding: 30px;
-			display: inline-block;
-			}
-		</style>
-		<meta charset="utf-8">
 		<title>Request Evalutation Page</title>
 		<link href="style.css" rel="stylesheet" type="text/css">
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
@@ -116,7 +73,7 @@ $_SESSION['csrf_token_time'] = time();
 			<a href="logout.php"><i class="fas fa-sign-out-alt"></i>Logout</a>
 		</div>
 	</nav>
-<body class="loggedin">
+<body class="loggedin reqeval">
 	<div class="content">
 		<h2>Request Evalutaion Form</h2>
 	<div>

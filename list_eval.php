@@ -75,81 +75,37 @@ if ($stmt = $con->prepare('SELECT admin, id, public_key FROM accounts WHERE id =
 <!DOCTYPE html>
 <html>
 	<head>
-		<meta charset="utf-8">
+		<meta
+			http-equiv="Content-Security-Policy"
+			content="default-src 'self'; 
+					script-src 
+							'self' 
+							https://apis.google.comhttps://apis.google.com 
+							https://www.google.com/recaptcha/ 
+							https://www.gstatic.com/recaptcha/;
+					style-src 
+							'self' 
+							https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css 
+							https://fonts.googleapis.com 
+							https://www.google.com/recaptcha/ 
+							https://www.gstatic.com/recaptcha/;
+					form-action 'self';
+					img-src 'self' www.gstatic.com;
+					frame-src 'self' https://www.google.com/recaptcha/;
+					object-src 'self' 'none';
+					base-uri 'self' 'none';" 
+  		/>
 		<title>Profile Page</title>
 		<link href="style.css" rel="stylesheet" type="text/css">
-		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-		<style>
-			select{
-				text-align-last:right;
-				padding-right: 29px;
-				direction: rtl;
-				width:120px;   
-
-			}
-			td {
-				word-break: break-all;
-				word-break: break-word;
-			}
-			#list{
-					font-size: 10px;
-					text-align: center;
-					font-weight: bold;
-					appearance:listbox;
-					width: 100%;
-					background-color: #90EE90;
-					border: 1;
-					border-color: black;
-			}
-			#see_pic{
-					width: 100%;
-					background-color: #90EE90;
-					border: 0;
-					cursor: pointer;
-					font-weight: bold;
-					transition: background-color 0.2s;
-			}
-			#remove{
-					width: 100%;
-					background-color: #ff6961;
-					border: 0;
-					cursor: pointer;
-					font-weight: bold;
-					transition: background-color 0.2s;
-			}
-			#contact{
-					width: 100%;
-					background-color: #FFD580;
-					border: 0;
-					cursor: pointer;
-					font-weight: bold;
-					transition: background-color 0.2s;
-			}
-			table {
-				border-collapse: collapse;
-			}
-			th {
-				border: 1px solid back;
-				padding-left: 50px;
-				padding-right: 50px;
-			}
-			td {
-				padding: 10px;
-				border: 1px solid;
-			}
-			tr:nth-child(even) {
-				background-color: #D6EEEE;
-			}
-      </style>
 	</head>
     <nav class="navtop">
 		<div>
 			<h1>Love Joy</h1>
-			<a href="profile.php"><i class="fas fa-user-circle"></i>Profile</a>
-			<a href="req_eval_html.php"><i class="fas fa-dragon"></i>Request Evaluation</a>
-			<a href="list_eval.php"><i class="fas fa-dragon"></i>View Evaluations</a>
-			<a href="logout.php"><i class="fas fa-sign-out-alt"></i>Logout</a>
+			<a href="profile.php"></i>Profile</a>
+			<a href="req_eval_html.php"></i>Request Evaluation</a>
+			<a href="list_eval.php"></i>View Evaluations</a>
+			<a href="logout.php"></i>Logout</a>
 		</div>
 	</nav>
 	<?php 
@@ -164,7 +120,7 @@ if ($stmt = $con->prepare('SELECT admin, id, public_key FROM accounts WHERE id =
 		$_SESSION['error'] = NULL;
 	}
 	?>
-	<body class="loggedin">
+	<body class="loggedin listeval">
 		<div class="content">
 			<h2>List of Evaluations</h2>
 			<div>
