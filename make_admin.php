@@ -121,6 +121,54 @@ if ($stmt = $con->prepare('INSERT INTO admin_key VALUES (?, ?)'))
         $admin = 1;
         $stmt->bind_param('sii', $public_key, $admin, $id);
         $stmt->execute();
+        $stmt->close();
+        if ($stmt = $con->prepare('SELECT p_key FROM admin_key WHERE id = ?'))
+        {
+            $stmt->bind_param('i', $_SESSION['id']);
+            $stmt->execute();
+            $stmt->bind_result($p_key);
+            $stmt->fetch();
+
+			// Get and decrypt private key for admin
+			$password = $_SESSION['password'];
+			$key = substr(hash('sha256', $password, true), 0, 32);
+			$cipher = 'aes-256-gcm';
+			$iv_len = openssl_cipher_iv_length($cipher);
+			$tag_length = 16;
+			
+			$textToDecrypt = $p_key;
+			$encrypted = base64_decode($textToDecrypt);
+			$iv = substr($encrypted, 0, $iv_len);
+			$ciphertext = substr($encrypted, $iv_len, -$tag_length);
+			$tag = substr($encrypted, -$tag_length);
+			$private_key = openssl_decrypt($ciphertext, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag);
+			    
+			if ($stmt = $con->prepare('SELECT id_evaluation, document_cipher FROM documen_key WHERE id_user = ?'))
+			{
+				$stmt->bind_param('i', $_SESSION['id']);
+				$stmt->execute();
+				while()
+				{
+					if (!openssl_private_decrypt($curr_cipher, $decrypted_curr_cipher, $private_key))
+					{
+						$error = array();
+						array_push($error, "Error with administration key, please contact a supervisor!");
+						$_SESSION['error'] = $error;
+						header('Location: profile.php');
+						exit();
+					}
+					if (!openssl_public_encrypt($decrypted_curr_cipher, $encrypted_photo_key, $public_key))
+					{
+						throw new Exception(openssl_error_string());
+					}
+					if ($stmt = $con->prepare('INSERT INTO document_key '))
+					$stmt->bind_param('iis', $evaluation_id, $row['id'], $encrypted_photo_key);
+					$stmt->execute();
+					$stmt->close();
+
+				}
+			}
+        }
     }
 }
 
