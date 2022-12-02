@@ -5,10 +5,11 @@
   - Password
   - Email
   - Phone Number
-- All the values of the account (with the exception of the username) are changable.
+- All the values of the account (with the exception of the username) are changeable.
 - All User data is stored in a database (MySQL)
 - All the sensitive data the user provides are stored encrypted (email, phone number, password)
   - Specifically the email and phone number, they are stored via a symmetrical encryption method. This method utilises the password of the user as its key. This allows the information of the user to be only visible by them.
+  - As we will see later, the password is salted and hashed before entered into the database.
 - XSS secure.
   - The website is secured against XSS via the htmlspecialcharacters() functions, this is used whenever data is echoed into HTML.
   - To further secure the website, CSP is utilised to provide extra protection against XSS attacks. As it stands, CSP allows only 'self' documents, and it allows for google captcha to work correctly. If, somehow, a link redirects to a foreign site, the website will block it. 
