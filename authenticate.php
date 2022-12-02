@@ -6,6 +6,8 @@ $empty = FALSE;
 
 ++$_SESSION['counter'];
 
+$error = array();
+
 //Captcha Checker
 if(isset($_POST['g-recaptcha-response']))
 {
@@ -39,31 +41,47 @@ if ($empty == TRUE)
 	exit();
 }
 
-//csrf token check (and time check)
+$calc = hash_hmac('sha256', 'authenticate.php', $_SESSION['second_token']);
+//CSRF token check with per-form token check, also timeout check
 if(isset($_POST) & !empty($_POST))
 {
 	if(isset($_POST['csrf_token']))
 	{
-		if($_POST['csrf_token'] == $_SESSION['csrf_token'])
+		if (hash_equals($calc,$_POST['token']))
 		{
+			if(hash_equals($_POST['csrf_token'], $_SESSION['csrf_token']))
+			{
+				// All good, continue...
+			}
+			else
+			{
+				array_push($error,'Token error, try again!');
+				session_unset();
+				$_SESSION['error'] = $error;
+				header('Location: login.php');
+				exit();
+			}
 		}
 		else
 		{
-			$_SESSION['error'] = 'Token Error, try again!';
+			array_push($error,'Token error, try again!');
 			session_unset();
+			$_SESSION['error'] = $error;
 			header('Location: login.php');
 			exit();
 		}
 	}
-	$maximum_time = 600;
-	if (isset($_SESSION['csrf_token_time']) & !empty($_SESSION['csrf_token_time']))
+	$maximum_time = 100;
+	if (isset($_SESSION['csrf_token_time']))
 	{
 		$token_time = $_SESSION['csrf_token_time'];
 		if(($token_time + $maximum_time) <= time())
 		{
 			unset($_SESSION['csrf_token_time']);
 			unset($_SESSION['csrf_token']);
-			$_SESSION['error'] = 'Token Expired, try again!';
+        	array_push($error,'Timeout error, try again!');
+			session_unset();
+			$_SESSION['error'] = $error;
 			header('Location: login.php');
 			exit();
 		}
@@ -187,22 +205,30 @@ if ($stmt = $con->prepare('SELECT id, pass, activation_code, admin FROM accounts
 			} 
 			else 
 			{
-			$_SESSION["error"] = "Activate Account First!";	
-			header('Location: login.php');
-			exit();
+				array_push($error,'Activate Account First');
+				session_unset();
+				$_SESSION['error'] = $error;
+				header('Location: login.php');
+				exit();
 			}
 	}
 	else
 	{
-		$_SESSION["error"] = "Password is Wrong!";	
+		array_push($error,'Password is wrong, try again!');
+		session_unset();
+		$_SESSION['error'] = $error;
 		header('Location: login.php');
 		exit();
 	}
-	} else {
+	} 
+	else 
+	{
 		// Incorrect username
-	$_SESSION["error"] = "Profile does not exist!";
-	header('Location: login.php');
-	exit();
+		array_push($error,'Password is wrong, try again!');
+		session_unset();
+		$_SESSION['error'] = $error;
+		header('Location: login.php');
+		exit();
 	}
 
 	$stmt->close();

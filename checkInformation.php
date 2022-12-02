@@ -10,24 +10,37 @@ $_SESSION['phone'] = $_POST['phone'];
 // Create error message array
 $error = array();
 
-
-//csrf token check (and time check)
+$calc = hash_hmac('sha256', 'checkInformation.php', $_SESSION['second_token']);
+//CSRF token check with per-form token check, also timeout check
 if(isset($_POST) & !empty($_POST))
 {
 	if(isset($_POST['csrf_token']))
 	{
-		if($_POST['csrf_token'] == $_SESSION['csrf_token'])
+		if (hash_equals($calc,$_POST['token']))
 		{
+			if(hash_equals($_POST['csrf_token'], $_SESSION['csrf_token']))
+			{
+				// All good, continue...
+			}
+			else
+			{
+				array_push($error,'Token error, try again!');
+				session_unset();
+				$_SESSION['error'] = $error;
+				header('Location: register.php');
+				exit();
+			}
 		}
 		else
 		{
-			$_SESSION['error'] = 'Token Error, try again!';
+			array_push($error,'Token error, try again!');
 			session_unset();
+			$_SESSION['error'] = $error;
 			header('Location: register.php');
 			exit();
 		}
 	}
-	$maximum_time = 600;
+	$maximum_time = 100;
 	if (isset($_SESSION['csrf_token_time']))
 	{
 		$token_time = $_SESSION['csrf_token_time'];
@@ -35,8 +48,9 @@ if(isset($_POST) & !empty($_POST))
 		{
 			unset($_SESSION['csrf_token_time']);
 			unset($_SESSION['csrf_token']);
-			$_SESSION['error'] = 'Token Expired, try again!';
+        	array_push($error,'Timeout error, try again!');
 			session_unset();
+			$_SESSION['error'] = $error;
 			header('Location: register.php');
 			exit();
 		}
@@ -57,7 +71,9 @@ if($responseKeys["success"])
 }
 else
 {
-	$_SESSION['error'] = 'Please complete capcha!';
+    array_push($error,'Please complete the captcha!');
+	session_unset();
+	$_SESSION['error'] = $error;
 	header('Location: register.php');
 	exit();
 }
@@ -90,8 +106,8 @@ if(!$uppercase || !$lowercase || !$number || !$specialChars || strlen($_SESSION[
 	{
 		array_push($error,"Password has to longer than 8 characters!");
 	}
-	$_SESSION['error'] = $error;
     session_unset();
+	$_SESSION['error'] = $error;
     header('Location: register.php');
 	exit();
 }
@@ -100,8 +116,8 @@ if(!$uppercase || !$lowercase || !$number || !$specialChars || strlen($_SESSION[
 if (preg_match("^[0-9A-Za-z_]+$", $_SESSION['username']) == 0)
 {
     array_push($error,"Invalid Username!");
-    $_SESSION['error'] = $error;
     session_unset();
+    $_SESSION['error'] = $error;
     header('Location: register.php');
     exit();
 }
@@ -110,8 +126,8 @@ if (preg_match("^[0-9A-Za-z_]+$", $_SESSION['username']) == 0)
 if (!filter_var($_SESSION['email'], FILTER_VALIDATE_EMAIL)) 
 {
     array_push($error,"Invalid email!");
-    $_SESSION['error'] = $error;
     session_unset();
+    $_SESSION['error'] = $error;
     header('Location: register.php');
     exit();
 }
@@ -120,8 +136,8 @@ if (!filter_var($_SESSION['email'], FILTER_VALIDATE_EMAIL))
 if (!is_numeric($_SESSION['phone']))
 {
     array_push($error,"Phone number should contain only numbers!");
-    $_SESSION['error'] = $error;
     session_unset();
+    $_SESSION['error'] = $error;
     header('Location: register.php');
     exit();
 }
@@ -129,8 +145,8 @@ if (!is_numeric($_SESSION['phone']))
 if (strlen($_SESSION['phone']) > 15)
 {
     array_push($error,"Phone number is invalid!");
-    $_SESSION['error'] = $error;
     session_unset();
+    $_SESSION['error'] = $error;
     header('Location: register.php');
     exit();
 }

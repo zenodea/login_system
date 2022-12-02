@@ -5,6 +5,10 @@ session_start(); // must be before any output
 $token =  bin2hex(random_bytes(32));
 $_SESSION['csrf_token'] = $token;
 $_SESSION['csrf_token_time'] = time();
+
+// Per-form csrf token
+$second_token = bin2hex(random_bytes(32));
+$_SESSION['second_token'] = $second_token;
 ?>
 
 
@@ -61,6 +65,7 @@ $_SESSION['csrf_token_time'] = time();
 			?>
 			<form action="checkInformation.php" method="POST" autocomplete="off">
 				<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
+				<input type="hidden" name="token" value="<?php echo htmlspecialchars(hash_hmac('sha256', 'checkInformation.php', $_SESSION['second_token']))?>"/>
 				<label for="username">
 					Username
 				</label>

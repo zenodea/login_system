@@ -3,6 +3,7 @@ error_reporting(E_ALL);
 ini_set('display_errors',1);
 session_start();
 
+
 // Preparing error array
 $error = array();
 
@@ -27,23 +28,36 @@ else
 	exit();
 }
 
-//CSRF token check (and time check)
+$calc = hash_hmac('sha256', 'recovery.php', $_SESSION['second_token']);
+//CSRF token check with per-form token check, also timeout check
 if(isset($_POST) & !empty($_POST))
 {
 	if(isset($_POST['csrf_token']))
 	{
-		if($_POST['csrf_token'] == $_SESSION['csrf_token'])
+		if (hash_equals($calc,$_POST['token']))
 		{
+			if(hash_equals($_POST['csrf_token'], $_SESSION['csrf_token']))
+			{
+				// All good, continue...
+			}
+			else
+			{
+				array_push($error,'Token error, try again!');
+				session_unset();
+				$_SESSION['error'] = $error;
+				header('Location: recovery_html.php');
+				exit();
+			}
 		}
 		else
 		{
-			$_SESSION['error'] = 'Token Error, try again!';
+			array_push($error,'Token error, try again!');
 			session_unset();
-			header('Location: recovery_html.php');
+			$_SESSION['error'] = $error;
 			exit();
 		}
 	}
-	$maximum_time = 600;
+	$maximum_time = 100;
 	if (isset($_SESSION['csrf_token_time']))
 	{
 		$token_time = $_SESSION['csrf_token_time'];
@@ -51,8 +65,9 @@ if(isset($_POST) & !empty($_POST))
 		{
 			unset($_SESSION['csrf_token_time']);
 			unset($_SESSION['csrf_token']);
-			$_SESSION['error'] = 'Token Expired, try again!';
+        	array_push($error,'Timeout error, try again!');
 			session_unset();
+			$_SESSION['error'] = $error;
 			header('Location: recovery_html.php');
 			exit();
 		}
