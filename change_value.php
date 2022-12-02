@@ -166,6 +166,15 @@ else
         $stmt->fetch();
         $stmt->close();
 
+        if ($stmt = $con->prepare('SELECT p_key FROM admin_key WHERE id = ?'))
+        {
+            $stmt->bind_param('i', $_SESSION['id']);
+            $stmt->execute();
+            $stmt->bind_result($encrypted_private_key);
+            $stmt->fetch();
+            $stmt->close();
+        }
+
         //Prepare Decrypt 
         $password = $_SESSION['password'];
         $key = substr(hash('sha256', $password, true), 0, 32);
@@ -182,6 +191,14 @@ else
         $ciphertext = substr($encrypted, $iv_len, -$tag_length);
         $tag = substr($encrypted, -$tag_length);
         $phone = openssl_decrypt($ciphertext, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag);
+
+        // Private key to decrypt
+        $textToDecrypt = $encrypted_private_key;
+        $encrypted = base64_decode($textToDecrypt);
+        $iv = substr($encrypted, 0, $iv_len);
+        $ciphertext = substr($encrypted, $iv_len, -$tag_length);
+        $tag = substr($encrypted, -$tag_length);
+        $private_key = openssl_decrypt($ciphertext, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag);
 
         // Email to decrypt
         $textToDecrypt = $email;
@@ -202,6 +219,10 @@ else
         $tag = ""; // will be filled by openssl_encrypt
 
         //Encrypting email with new key
+        $new_enc_p_key = openssl_encrypt($private_key, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag, "", $tag_length);
+        $final_p_key = base64_encode($iv.$new_enc_p_key.$tag);
+
+        //Encrypting email with new key
         $encrypt_mail = openssl_encrypt($email, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag, "", $tag_length);
         $final_mail = base64_encode($iv.$encrypt_mail.$tag);
 
@@ -216,6 +237,13 @@ else
         {
             $stmt->bind_param('sssi', $final_mail, $final_phone, $finalValue, $_SESSION['id']);
             $stmt->execute();
+            $stmt->close();
+            if ($stmt = $con->prepare('UPDATE admin_key SET p_key = ? WHERE id = ?'))
+            {
+                $stmt->bind_param('si', $final_p_key, $_SESSION['id']);
+                $stmt->execute();
+                $stmt->close();
+            }
             $correct = array();
             array_push($correct, "Change succesfully made!");
             $_SESSION['success'] = $correct;

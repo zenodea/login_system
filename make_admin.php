@@ -58,14 +58,14 @@ if ( mysqli_connect_errno() )
 }
 
 // Check password is correct
-if ($stmt = $con->prepare('SELECT id, admin FROM accounts WHERE username = ?')) 
+if ($stmt = $con->prepare('SELECT id, pass, admin FROM accounts WHERE username = ?')) 
 {
 	$stmt->bind_param('s', $_POST['username']);
 	$stmt->execute();
 	// Store the result so we can check if the account exists in the database.
 	$stmt->store_result();
 	if ($stmt->num_rows > 0) {
-        $stmt->bind_result($id, $admin);
+        $stmt->bind_result($id, $password, $admin);
         $stmt->fetch();
         $stmt->close();
         if ($admin == 1)
@@ -128,6 +128,7 @@ if ($stmt = $con->prepare('INSERT INTO admin_key VALUES (?, ?)'))
             $stmt->execute();
             $stmt->bind_result($p_key);
             $stmt->fetch();
+			$stmt->close();
 
 			// Get and decrypt private key for admin
 			$password = $_SESSION['password'];
@@ -143,13 +144,14 @@ if ($stmt = $con->prepare('INSERT INTO admin_key VALUES (?, ?)'))
 			$tag = substr($encrypted, -$tag_length);
 			$private_key = openssl_decrypt($ciphertext, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag);
 			    
-			if ($stmt = $con->prepare('SELECT id_evaluation, document_cipher FROM documen_key WHERE id_user = ?'))
+			if ($stmt = $con->prepare('SELECT id_evaluation, document_cipher FROM document_key WHERE id_user = ?'))
 			{
 				$stmt->bind_param('i', $_SESSION['id']);
 				$stmt->execute();
-				while()
+				$result = $stmt->get_result();
+				while ($row = $result->fetch_assoc())
 				{
-					if (!openssl_private_decrypt($curr_cipher, $decrypted_curr_cipher, $private_key))
+					if (!openssl_private_decrypt($row['document_cipher'], $decrypted_curr_cipher, $private_key))
 					{
 						$error = array();
 						array_push($error, "Error with administration key, please contact a supervisor!");
@@ -161,17 +163,17 @@ if ($stmt = $con->prepare('INSERT INTO admin_key VALUES (?, ?)'))
 					{
 						throw new Exception(openssl_error_string());
 					}
-					if ($stmt = $con->prepare('INSERT INTO document_key '))
-					$stmt->bind_param('iis', $evaluation_id, $row['id'], $encrypted_photo_key);
-					$stmt->execute();
-					$stmt->close();
-
+					if ($stmt = $con->prepare('INSERT INTO document_key VALUES (?, ?, ?)'))
+					{
+						$stmt->bind_param('iis', $row['id_evaluation'], $id, $encrypted_photo_key);
+						$stmt->execute();
+						$stmt->close();
+					}
 				}
 			}
         }
     }
 }
-
 $_SESSION["correct"] = "Username succesfully made into admin!";	
 header('Location: make_admin_html.php');
 exit();

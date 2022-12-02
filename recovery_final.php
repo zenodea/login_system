@@ -99,13 +99,24 @@ if ($stmt = $con->prepare('DELETE FROM recovery_password WHERE username = ?'))
     // Set the new activation code to 'activated', this is how we can check if the user has activated their account.
     $stmt->bind_param('s', $_SESSION['username']);
     $stmt->execute();
+	$stmt->close();
+
 	$password = password_hash($_POST['password'], PASSWORD_DEFAULT);
     if ($stmt = $con->prepare('UPDATE accounts SET pass = ? WHERE username = ?')) 
     {
         // Set the new activation code to 'activated', this is how we can check if the user has activated their account.
         $stmt->bind_param('ss', $password, $_SESSION['username']);
         $stmt->execute();
+		$stmt->close();
 
+		if ($stmt = $con->prepare('SELECT admin, id FROM accounts WHERE username = ?'))
+		{
+			$stmt->bind_param('s', $_SESSION['username']);
+			$stmt->execute();
+			$stmt->bind_result($admin, $id);
+			$stmt->fetch();
+			$stmt->close();
+		}
         session_unset();
         $success = array();
         array_push($success, 'Password Succesfully Changed!');

@@ -74,15 +74,22 @@ if (mysqli_connect_errno())
     echo "yikes";
 }
 
-if ($stmt = $con->prepare('SELECT email FROM accounts WHERE username = ?'))
+if ($stmt = $con->prepare('SELECT email, admin FROM accounts WHERE username = ?'))
 {
 	$stmt->bind_param('s',$_POST['user']);
 	$stmt->execute();
     $stmt->store_result();
 	if ($stmt->num_rows > 0)
 	{
-		$stmt->bind_result($email);
+		$stmt->bind_result($email, $admin);
 		$stmt->fetch();
+		if ($admin == 1)
+		{
+			array_push($error,'User is an admin, please contact another admin to restore the account!');
+			$_SESSION['error'] = $error;
+			header('Location: recovery_html.php');
+			exit();
+		}
 		if ($stmt = $con->prepare('INSERT INTO recovery_password VALUES (?, ?, CURRENT_TIMESTAMP)'))
 		{
 			// Creating uniqid(); for recovery code

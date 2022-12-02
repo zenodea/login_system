@@ -45,9 +45,15 @@ if ($stmt = $con->prepare('SELECT url FROM evaluations WHERE id = ?'))
             $stmt->bind_param('i',$_POST['remove']);
             $stmt->execute();
             $stmt->close();
-            $_SESSION['correct'] = "Evaluation succesfully resolved!";
-            header('Location: list_eval.php');
-            exit();
+            if ($stmt = $con->prepare('DELETE FROM document_key WHERE id_evaluation = ?'))
+            {
+                $stmt->bind_param('i',$_POST['remove']);
+                $stmt->execute();
+                $stmt->close();
+                $_SESSION['correct'] = "Evaluation succesfully resolved!";
+                header('Location: list_eval.php');
+                exit();
+            }
         }
         else
         {

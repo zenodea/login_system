@@ -151,6 +151,10 @@ if ($stmt = $con->prepare("INSERT INTO evaluations (id_user, header, comment, ur
 	if ($uploadfile != "None")
 	{
 	}
+	else
+	{
+		$newFileName = "None";
+	}
 	
 	//Encrypting header 
 	$header_encrypt = openssl_encrypt($header, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag, "", $tag_length);
