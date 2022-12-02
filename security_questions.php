@@ -70,21 +70,21 @@ $_SESSION['csrf_token_time'] = time();
 				<select name="first_question" id="first_question">
 					<option value="">--- select security question ---</option>
 					<?php foreach($questions as $value => $key): ?>
-						<option value=<?= $value; ?>><?= $key; ?></option>
+						<option value=<?= htmlspecialchars($value); ?>><?= htmlspecialchars($key); ?></option>
 					<?php endforeach; ?>
 				</select>
 				<input type="text" name="first_answer" placeholder="Answer" id="first_answer" required>
 				<select name="second_question" id="second_question">
 					<option value="">--- Select Security Question ---</option>
 					<?php foreach($questions as $value => $key): ?>
-						<option value=<?= $value; ?>><?= $key; ?></option>
+						<option value=<?= htmlspecialchars($value); ?>><?= htmlspecialchars($key); ?></option>
 					<?php endforeach; ?>
 					</select>
 					<input type="text" name="second_answer" placeholder="Answer" id="second_answer" required>
 				<select name="third_question" id="third_question">
 					<option value="">--- Select Security Question ---</option>
 					<?php foreach($questions as $value => $key): ?>
-						<option value=<?= $value; ?>><?= $key; ?></option>
+						<option value=<?= htmlspecialchars($value); ?>><?= htmlspecialchars($key); ?></option>
 					<?php endforeach; ?>
 				</select>
 				<input type="text" name="third_answer" placeholder="Answer" id="third_answer" required>

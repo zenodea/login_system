@@ -94,14 +94,14 @@ $_SESSION['csrf_token_time'] = time();
 				// and individually display as an option
 				$category = mysqli_fetch_array($all_categories,MYSQLI_ASSOC);
 			?>
-			<option value=<?php echo $category["email"];?>>
+			<option value=<?php echo htmlspecialchars($category["email"]);?>>
 				<?php 
-				echo "Email: ".$category["email"];
+				echo "Email: ".htmlspecialchars($category["email"]);
 				?>
 			</option>
-			<option value=<?php echo $category["phone_no"];?>>
+			<option value=<?php echo htmlspecialchars($category["phone_no"]);?>>
 				<?php 
-				echo "Phone Number: ". $category["phone_no"];
+				echo "Phone Number: ". htmlspecialchars($category["phone_no"]);
 				?>
 			</option>
 	</select>

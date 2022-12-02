@@ -159,7 +159,7 @@ if ($stmt = $con->prepare('SELECT admin, id, public_key FROM accounts WHERE id =
 					$iv_len = openssl_cipher_iv_length($cipher);
 					$tag_length = 16;
 
-					?><td><?php echo $row['id_user'];?></td><?php
+					?><td><?php echo htmlspecialchars($row['id_user']);?></td><?php
 					// header to decrypt
 					$textToDecrypt = $row['header'];
 					$encrypted = base64_decode($textToDecrypt);
@@ -167,7 +167,7 @@ if ($stmt = $con->prepare('SELECT admin, id, public_key FROM accounts WHERE id =
 					$ciphertext = substr($encrypted, $iv_len, -$tag_length);
 					$tag = substr($encrypted, -$tag_length);
 					$email = openssl_decrypt($ciphertext, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag);
-					?><td><?php echo $email;?></td><?php
+					?><td><?php echo htmlspecialchars($email);?></td><?php
 
 					// comment to decrypt
 					$textToDecrypt = $row['comment'];
@@ -176,7 +176,7 @@ if ($stmt = $con->prepare('SELECT admin, id, public_key FROM accounts WHERE id =
 					$ciphertext = substr($encrypted, $iv_len, -$tag_length);
 					$tag = substr($encrypted, -$tag_length);
 					$comment = openssl_decrypt($ciphertext, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag);
-					?><td><?php echo $comment;?></td><?php
+					?><td><?php echo htmlspecialchars($comment);?></td><?php
 
 					// contact to decrypt
 					$textToDecrypt = $row['contact'];
@@ -188,7 +188,7 @@ if ($stmt = $con->prepare('SELECT admin, id, public_key FROM accounts WHERE id =
 					if ($row['url'] == "None")
 					{
 						?>
-						<td><?php echo "None";?></td>
+						<td><?php echo htmlspecialchars("None");?></td>
 						<td> 
 						<?php
 					}
@@ -196,16 +196,16 @@ if ($stmt = $con->prepare('SELECT admin, id, public_key FROM accounts WHERE id =
 					{
 						?>
 					<form action="show_image.php" method="POST">
-						<input type="hidden" name="description" value=<?php echo $email;?> id="description" hidden>
-						<input type="hidden" name="key" value=<?php echo $decrypted_curr_cipher;?> id="what" hidden>
-						<input type="hidden" name="image" value=<?php echo $row['url'];?> id="image" hidden>
+						<input type="hidden" name="description" value=<?php echo htmlspecialchars($email);?> id="description" hidden>
+						<input type="hidden" name="key" value=<?php echo htmlspecialchars($decrypted_curr_cipher);?> id="what" hidden>
+						<input type="hidden" name="image" value=<?php echo htmlspecialchars($row['url']);?> id="image" hidden>
 						<td><input type="submit" value="See Picture" id="see_pic"></td>
 					</form>
 						<td> 
 						<?php
 					}
 					?>
-					<input type="submit" value=<?php echo $contact?> id="contact"/>
+					<input type="submit" value=<?php echo htmlspecialchars($contact)?> id="contact"/>
 						<td>
 					<form action="remove_eval.php" method="POST">
 						<input type="hidden" name="remove" value=<?php echo $row['id'];?> id="remove" />

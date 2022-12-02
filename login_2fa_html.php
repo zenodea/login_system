@@ -48,7 +48,7 @@ $_SESSION['csrf_token_time'] = time();
 			if (isset($_SESSION["error"]) & !empty($_SESSION["error"])) {echo "<p class='alert alert-danger'>". $_SESSION["error"] . " </p>"; $_SESSION['error'] = NULL;}
 			?>
 			<form  action="login_2fa.php"  method="POST" required>
-				<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
+				<input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($token);?>">
 				<label for="password">
 					PIN
 				</label>
@@ -56,11 +56,11 @@ $_SESSION['csrf_token_time'] = time();
 				<input type="submit" value="Login" >
 			</form>
 			<form action="register.php">
-			<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
+			<input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($token);?>">
 				<input type="submit" value="Register" />
 			</form>
 			<form action="recovery_html.php">
-			<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
+			<input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($token);?>">
 				<input type="submit" value="Forgot Password" />
 			</form>
 	</body>

@@ -150,9 +150,9 @@ $_SESSION['csrf_token_time'] = time();
 			{
 				if (is_array($_SESSION['error']))
 				{
-					foreach($_SESSION['error'] as $key => $value)
+					foreach($_SESSION['error'] as $key => $values)
 					{
-						echo "<p class='alert alert-danger'>". $value . "</p>"; 
+						echo "<p class='alert alert-danger'>". $values . "</p>"; 
 					}
 				}
 				else
@@ -172,12 +172,12 @@ $_SESSION['csrf_token_time'] = time();
 			?>
 			<h2>Answer Security Questions To Continue</h2>
 			<form action="change_value.php" method="POST" autocomplete="off">
-				<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
+				<input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($token);?>">
 
-				<label><?php echo "Old " . $value;?></label>
+				<label><?php echo "Old " . htmlspecialchars($value);?></label>
 					<input type="text" name="oldValue" value=<?php echo $oldValue;?> id="Old Value" disabled="disabled"><br><br>
 
-				<label><?php echo "New " . $value;?></label>
+				<label><?php echo "New " . htmlspecialchars($value);?></label>
 					<input type="text" name="newValue" placeholder="New Value" id="New Value" required><br><br>
 
 				<input type="submit" value="Continue">

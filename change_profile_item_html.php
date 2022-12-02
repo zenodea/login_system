@@ -99,13 +99,13 @@ $_SESSION['csrf_token_time'] = time();
 			<form action="change_profile_item_check.php" method="POST" autocomplete="off">
 				<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
 				
-				<label for=<?php echo $questions[$one] ?>><?php echo $questions[$one] ?></label>
+				<label for=<?php echo $questions[$one] ?>><?php echo htmlspecialchars($questions[$one]) ?></label>
 					<input type="text" name="first_answer" placeholder="Answer" id="first_answer" required><br><br>
 
-				<label for=<?php echo $questions[$two] ?>><?php echo $questions[$two] ?></label>
+				<label for=<?php echo $questions[$two] ?>><?php echo htmlspecialchars($questions[$two]) ?></label>
 					<input type="text" name="second_answer" placeholder="Answer" id="second_answer" required><br><br>
 
-				<label for=<?php echo $questions[$three] ?>><?php echo $questions[$three] ?></label>
+				<label for=<?php echo $questions[$three] ?>><?php echo htmlspecialchars($questions[$three]) ?></label>
 					<input type="text" name="third_answer" placeholder="Answer" id="third_answer" required><br><br>
 
 				<input type="submit" value="Continue">
