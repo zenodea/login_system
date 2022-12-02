@@ -137,17 +137,7 @@ if ($valueToSelect != "password")
 {
     if ($stmt = $con->prepare('UPDATE accounts SET '.$valueToSelect.' = ? WHERE id = ?')) 
     {
-            //Prepare Encryption
-            $password = $_SESSION['password'];
-            $key = substr(hash('sha256', $password, true), 0, 32);
-            $cipher = 'aes-256-gcm';
-            $iv_len = openssl_cipher_iv_length($cipher);
-            $tag_length = 16;
-            $iv = openssl_random_pseudo_bytes($iv_len);
-            $tag = ""; // will be filled by openssl_encrypt
-            $encrypted_value = openssl_encrypt($finalValue, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag, "", $tag_length);
-            $encrypted_value = base64_encode($iv.$encrypted_value.$tag);
-            $stmt->bind_param('si',  $encrypted_value, $_SESSION['id']);
+            $stmt->bind_param('si',  $finalValue, $_SESSION['id']);
             $stmt->execute();
             $correct = array();
             array_push($correct, "Change succesfully made!");
@@ -158,55 +148,42 @@ if ($valueToSelect != "password")
 }
 else
 {
-    if ($stmt = $con->prepare('SELECT email, phone_no FROM accounts WHERE id = ?'))
+    if ($stmt = $con->prepare('SELECT email, phone_no, admin FROM accounts WHERE id = ?'))
     {
         $stmt->bind_param('i', $_SESSION['id']);
         $stmt->execute();
-        $stmt->bind_result($email, $phone);
+        $stmt->bind_result($email, $phone, $admin);
         $stmt->fetch();
         $stmt->close();
 
-        if ($stmt = $con->prepare('SELECT p_key FROM admin_key WHERE id = ?'))
+        if($admin == 1)
         {
-            $stmt->bind_param('i', $_SESSION['id']);
-            $stmt->execute();
-            $stmt->bind_result($encrypted_private_key);
-            $stmt->fetch();
-            $stmt->close();
+            if ($stmt = $con->prepare('SELECT p_key FROM admin_key WHERE id = ?'))
+            {
+                $stmt->bind_param('i', $_SESSION['id']);
+                $stmt->execute();
+                $stmt->bind_result($encrypted_private_key);
+                $stmt->fetch();
+                $stmt->close();
+
+                //Prepare Decrypt 
+                $password = $_SESSION['password'];
+                $key = substr(hash('sha256', $password, true), 0, 32);
+                $cipher = 'aes-256-gcm';
+                $iv_len = openssl_cipher_iv_length($cipher);
+                $tag_length = 16;
+                $iv = openssl_random_pseudo_bytes($iv_len);
+                $tag = ""; // will be filled by openssl_encrypt
+                
+                // Private key to decrypt
+                $textToDecrypt = $encrypted_private_key;
+                $encrypted = base64_decode($textToDecrypt);
+                $iv = substr($encrypted, 0, $iv_len);
+                $ciphertext = substr($encrypted, $iv_len, -$tag_length);
+                $tag = substr($encrypted, -$tag_length);
+                $private_key = openssl_decrypt($ciphertext, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag);
+            }
         }
-
-        //Prepare Decrypt 
-        $password = $_SESSION['password'];
-        $key = substr(hash('sha256', $password, true), 0, 32);
-        $cipher = 'aes-256-gcm';
-        $iv_len = openssl_cipher_iv_length($cipher);
-        $tag_length = 16;
-        $iv = openssl_random_pseudo_bytes($iv_len);
-        $tag = ""; // will be filled by openssl_encrypt
-
-        // Phone to decrypt
-        $textToDecrypt = $phone;
-        $encrypted = base64_decode($textToDecrypt);
-        $iv = substr($encrypted, 0, $iv_len);
-        $ciphertext = substr($encrypted, $iv_len, -$tag_length);
-        $tag = substr($encrypted, -$tag_length);
-        $phone = openssl_decrypt($ciphertext, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag);
-
-        // Private key to decrypt
-        $textToDecrypt = $encrypted_private_key;
-        $encrypted = base64_decode($textToDecrypt);
-        $iv = substr($encrypted, 0, $iv_len);
-        $ciphertext = substr($encrypted, $iv_len, -$tag_length);
-        $tag = substr($encrypted, -$tag_length);
-        $private_key = openssl_decrypt($ciphertext, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag);
-
-        // Email to decrypt
-        $textToDecrypt = $email;
-        $encrypted = base64_decode($textToDecrypt);
-        $iv = substr($encrypted, 0, $iv_len);
-        $ciphertext = substr($encrypted, $iv_len, -$tag_length);
-        $tag = substr($encrypted, -$tag_length);
-        $email = openssl_decrypt($ciphertext, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag);
 
         //Prepare Encyrpt 
         $_SESSION['password'] = $finalValue;
@@ -218,31 +195,29 @@ else
         $iv = openssl_random_pseudo_bytes($iv_len);
         $tag = ""; // will be filled by openssl_encrypt
 
-        //Encrypting email with new key
-        $new_enc_p_key = openssl_encrypt($private_key, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag, "", $tag_length);
-        $final_p_key = base64_encode($iv.$new_enc_p_key.$tag);
-
-        //Encrypting email with new key
-        $encrypt_mail = openssl_encrypt($email, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag, "", $tag_length);
-        $final_mail = base64_encode($iv.$encrypt_mail.$tag);
-
-        //Encrypting phone_no with new key
-        $encrypt_phone = openssl_encrypt($phone, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag, "", $tag_length);
-        $final_phone = base64_encode($iv.$encrypt_phone.$tag);
+        if ($admin == 1)
+        {
+            //Encrypting private_key with new key
+            $new_enc_p_key = openssl_encrypt($private_key, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag, "", $tag_length);
+            $final_p_key = base64_encode($iv.$new_enc_p_key.$tag);
+        }
 
         //Salt and Hash new password
         $finalValue = password_hash($finalValue, PASSWORD_DEFAULT);
 
-        if ($stmt = $con->prepare('UPDATE accounts SET email = ?, phone_no = ?, pass = ? WHERE id = ?'))
+        if ($stmt = $con->prepare('UPDATE accounts SET  pass = ? WHERE id = ?'))
         {
-            $stmt->bind_param('sssi', $final_mail, $final_phone, $finalValue, $_SESSION['id']);
+            $stmt->bind_param('si', $finalValue, $_SESSION['id']);
             $stmt->execute();
             $stmt->close();
-            if ($stmt = $con->prepare('UPDATE admin_key SET p_key = ? WHERE id = ?'))
+            if ($admin == 1)
             {
-                $stmt->bind_param('si', $final_p_key, $_SESSION['id']);
-                $stmt->execute();
-                $stmt->close();
+                if ($stmt = $con->prepare('UPDATE admin_key SET p_key = ? WHERE id = ?'))
+                {
+                    $stmt->bind_param('si', $final_p_key, $_SESSION['id']);
+                    $stmt->execute();
+                    $stmt->close();
+                }
             }
             $correct = array();
             array_push($correct, "Change succesfully made!");

@@ -35,17 +35,9 @@ $cipher = 'aes-256-gcm';
 $iv_len = openssl_cipher_iv_length($cipher);
 $tag_length = 16;
 
-// 2FA to decrypt
-$textToDecrypt = $secret_encrypted;
-$encrypted = base64_decode($textToDecrypt);
-$iv = substr($encrypted, 0, $iv_len);
-$ciphertext = substr($encrypted, $iv_len, -$tag_length);
-$tag = substr($encrypted, -$tag_length);
-$secret = openssl_decrypt($ciphertext, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag);
-
 // Checking 2FA code
 $tfa = new RobThree\Auth\TwoFactorAuth('Lovejoy');
-if ($tfa->verifyCode($secret, $_POST['2fa']) === true)
+if ($tfa->verifyCode($secret_encrypted, $_POST['2fa']) === true)
 {
     $_SESSION['loggedin'] = TRUE;
     header('Location: profile.php');
@@ -53,7 +45,7 @@ if ($tfa->verifyCode($secret, $_POST['2fa']) === true)
 }
 else
 {
-    $_SESSION['error'] = $secret_encrypted;
+    $_SESSION['error'] = "Wrong PIN!";
     header('Location: login_2fa_html.php');
     exit();
 }

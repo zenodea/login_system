@@ -32,15 +32,6 @@ $DATABASE_USER = $configs['username'];
 $DATABASE_PASS = $configs['db_pass'];
 $DATABASE_NAME = $configs['db_name'];
 
-// Prepare to Decrypt
-$password = $_SESSION['password'];
-$key = substr(hash('sha256', $password, true), 0, 32);
-$cipher = 'aes-256-gcm';
-$iv_len = openssl_cipher_iv_length($cipher);
-$tag_length = 16;
-$iv = openssl_random_pseudo_bytes($iv_len);
-$tag = ""; // will be filled by openssl_encrypt
-
 // Try and connect using the info above.
 $con = mysqli_connect($DATABASE_HOST, $DATABASE_USER, $DATABASE_PASS, $DATABASE_NAME);
 if (mysqli_connect_errno()) 
@@ -59,24 +50,11 @@ if ($stmt = $con->prepare('SELECT email, phone_no FROM accounts WHERE id = ?'))
 	$stmt->close();
     if ($value == "Phone Number")
     {
-        $textToDecrypt = $old_phone_no;
-        $encrypted = base64_decode($textToDecrypt);
-        $iv = substr($encrypted, 0, $iv_len);
-        $ciphertext = substr($encrypted, $iv_len, -$tag_length);
-        $tag = substr($encrypted, -$tag_length);
-        $decrypted_value = openssl_decrypt($ciphertext, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag);
-        $oldValue = $decrypted_value;
+        $oldValue = $old_phone_no;
     }
     elseif ($value == "Email")
     {
-        $textToDecrypt = $old_email;
-        $encrypted = base64_decode($textToDecrypt);
-        $iv = substr($encrypted, 0, $iv_len);
-        $ciphertext = substr($encrypted, $iv_len, -$tag_length);
-        $tag = substr($encrypted, -$tag_length);
-        $decrypted_value = openssl_decrypt($ciphertext, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag);
-        $oldValue = $oldValue = $decrypted_value;
-;
+        $oldValue = $old_email;
     }
 }
 

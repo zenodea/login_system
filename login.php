@@ -37,7 +37,6 @@ $_SESSION['csrf_token_time'] = time();
 					base-uri 'self' 'none';" 
   		/>
 		<title>Login</title>
-		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
 		<link rel="stylesheet" href='https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css'>
 		<link href="style.css" rel="stylesheet" type="text/css">
 		<script src='https://www.google.com/recaptcha/api.js' nonce="{NONCE}"></script>

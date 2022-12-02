@@ -88,7 +88,7 @@ $_SESSION['csrf_token_time'] = time();
 				<label>Username of user to make adming</label>
 					<input type="text" name="username" placeholder="Username" id="username" required><br><br>
 				<label>Password of username</label>
-					<input type="text" name="password" placeholder="Username Password" id="password" required><br><br>
+					<input type="password" name="password" placeholder="Username Password" id="password" required><br><br>
 				<input type="submit" value="Continue">
 			</form>
 	</body>

@@ -118,9 +118,9 @@ $_SESSION['csrf_token_time'] = time();
 			<form  action="recovery_final.php"  method="POST" required>
 				<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
 
-				<label for="password"> <i class="fas fa-lock"></i> </label>
+				<label for="password"> Password </label>
 					<input type="password" name="password" placeholder="New Password" id="password">
-				<label for="password"> <i class="fas fa-lock"> </i></label>
+				<label for="password"> Password </i></label>
 					<input type="password" name="retype" placeholder="Retype Password" id="retype">
 
 				<input type="submit" value="Reset Password" >

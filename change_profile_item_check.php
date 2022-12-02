@@ -74,7 +74,7 @@ if ($stmt = $con->prepare('SELECT first_q, second_q, third_q FROM security_quest
 	if (!password_verify($question_one, $one))
 	{
 		$_SESSION['error'] = 'One of the security questions is incorrect, please try again!';
-		header('Location: change_profile_item_html.php');
+		header('Location: profile.php');
 		exit();
 	}
 
@@ -82,7 +82,7 @@ if ($stmt = $con->prepare('SELECT first_q, second_q, third_q FROM security_quest
 	if (!password_verify($question_two, $two))
 	{
 		$_SESSION['error'] = 'One of the security questions is incorrect, please try again!';
-		header('Location: change_profile_item_html.php');
+		header('Location: profile.php');
 		exit();
 	}
 
@@ -90,7 +90,7 @@ if ($stmt = $con->prepare('SELECT first_q, second_q, third_q FROM security_quest
 	if (!password_verify($question_three, $three))
 	{
 		$_SESSION['error'] = 'One of the security questions is incorrect, please try again!';
-		header('Location: change_profile_item_html.php');
+		header('Location: profile.php');
 		exit();
 	}
 

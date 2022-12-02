@@ -205,7 +205,7 @@ if ($stmt = $con->prepare('SELECT admin, id, public_key FROM accounts WHERE id =
 						<?php
 					}
 					?>
-					<input type="submit" value=<?php echo $contact;?> id="contact"/>
+					<input type="submit" value=<?php echo $contact?> id="contact"/>
 						<td>
 					<form action="remove_eval.php" method="POST">
 						<input type="hidden" name="remove" value=<?php echo $row['id'];?> id="remove" />

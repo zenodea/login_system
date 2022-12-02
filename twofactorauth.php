@@ -42,15 +42,6 @@ $DATABASE_USER = $configs['username'];
 $DATABASE_PASS = $configs['db_pass'];
 $DATABASE_NAME = $configs['db_name'];
 
-//Prepare Encryption
-$password = $_SESSION['password'];
-$key = substr(hash('sha256', $password, true), 0, 32);
-$cipher = 'aes-256-gcm';
-$iv_len = openssl_cipher_iv_length($cipher);
-$tag_length = 16;
-$iv = openssl_random_pseudo_bytes($iv_len);
-$tag = ""; // will be filled by openssl_encrypt
-
 // Try and connect using the info above.
 $con = mysqli_connect($DATABASE_HOST, $DATABASE_USER, $DATABASE_PASS, $DATABASE_NAME);
 if (mysqli_connect_errno()) 
@@ -62,11 +53,8 @@ if (mysqli_connect_errno())
 // Preparing to insert 2fa code into the database
 if ($stmt = $con->prepare('INSERT INTO 2fa VALUES (?, ?)'))
 {
-	//Encrypting  phone_no
-	$secret = openssl_encrypt($_POST['secret'], $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag, "", $tag_length);
-	$secret = base64_encode($iv.$phone.$tag);
 	// In this case we can use the account ID to get the account info.
-	$stmt->bind_param('is', $_SESSION['id'], $secret);
+	$stmt->bind_param('is', $_SESSION['id'], $_POST['secret']);
 	$stmt->execute();
 	$success = array();
 	array_push($success,'Two Factor Authentication Activated!');

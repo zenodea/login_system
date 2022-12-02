@@ -58,7 +58,7 @@ if($responseKeys["success"])
 else
 {
 	$_SESSION['error'] = 'Please complete capcha!';
-	header('Location: login.php');
+	header('Location: register.php');
 	exit();
 }
 
@@ -96,6 +96,15 @@ if(!$uppercase || !$lowercase || !$number || !$specialChars || strlen($_SESSION[
 	exit();
 }
 
+#Check Username is valid
+if (preg_match("^[0-9A-Za-z_]+$", $_SESSION['username']) == 0)
+{
+    array_push($error,"Invalid Username!");
+    $_SESSION['error'] = $error;
+    session_unset();
+    header('Location: register.php');
+    exit();
+}
 
 #Check Email is correct
 if (!filter_var($_SESSION['email'], FILTER_VALIDATE_EMAIL)) 

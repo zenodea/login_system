@@ -22,13 +22,6 @@ if (mysqli_connect_errno())
 	echo "yikes";
 }
  
-// Preparing decryption
-$password = $_SESSION['password'];
-$key = substr(hash('sha256', $password, true), 0, 32);
-$cipher = 'aes-256-gcm';
-$iv_len = openssl_cipher_iv_length($cipher);
-$tag_length = 16;
-
 // Preparing and setting CSRF token
 $token =  bin2hex(random_bytes(32));
 $_SESSION['csrf_token'] = $token;
@@ -100,31 +93,15 @@ $_SESSION['csrf_token_time'] = time();
 				// from the $all_categories variable
 				// and individually display as an option
 				$category = mysqli_fetch_array($all_categories,MYSQLI_ASSOC);
-
-				//Decrypt Phone Number
-				$phone = $category["phone_no"];
-				$encrypted = base64_decode($phone);
-				$iv = substr($encrypted, 0, $iv_len);
-				$ciphertext = substr($encrypted, $iv_len, -$tag_length);
-				$tag = substr($encrypted, -$tag_length);
-				$phone = openssl_decrypt($ciphertext, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag);
-
-				//Decrypt Email 
-				$email = $category["email"];
-				$encrypted = base64_decode($email);
-				$iv = substr($encrypted, 0, $iv_len);
-				$ciphertext = substr($encrypted, $iv_len, -$tag_length);
-				$tag = substr($encrypted, -$tag_length);
-				$email = openssl_decrypt($ciphertext, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag);
 			?>
 			<option value=<?php echo $email;?>>
 				<?php 
-				echo "Email: ".$email;
+				echo "Email: ".$category["email"];
 				?>
 			</option>
 			<option value=<?php echo $phone;?>>
 				<?php 
-				echo "Phone Number: ". $phone;
+				echo "Phone Number: ". $category["phone_no"];
 				?>
 			</option>
 	</select>
