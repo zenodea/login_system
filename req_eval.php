@@ -201,6 +201,7 @@ if ($stmt = $con->prepare("INSERT INTO evaluations (id_user, header, comment, ur
 	//Encrypting Photo
 	if ($uploadfile != "None")
 	{
+
 	}
 	else
 	{

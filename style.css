@@ -55,6 +55,18 @@ body {
     transition: background-color 0.2s;
 }
 
+.login button {
+    width: 100%;
+    padding: 15px;
+   margin-top: 20px;
+    background-color: #2f3947;
+    border: 0;
+    cursor: pointer;
+    font-weight: bold;
+    color: #ffffff;
+    transition: background-color 0.2s;
+}
+
 .login form input[type="file"] {
     width: 100%;
     padding: 15px;

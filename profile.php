@@ -22,15 +22,21 @@ if (mysqli_connect_errno())
 	exit('Failed to connect to MySQL: ' . mysqli_connect_error());
 }
 
+$googleAccount = False;
+
 // We don't have the password or email info stored in sessions so instead we can get the results from the database.
-if ($stmt = $con->prepare('SELECT phone_no, email, admin FROM accounts WHERE id = ?'))
+if ($stmt = $con->prepare('SELECT phone_no, email, admin, google_id FROM accounts WHERE id = ?'))
 {
 	// In this case we can use the account ID to get the account info.
 	$stmt->bind_param('i', $_SESSION['id']);
 	$stmt->execute();
-	$stmt->bind_result($phone, $email, $admin);
+	$stmt->bind_result($phone, $email, $admin, $google_id);
 	$stmt->fetch();
 	$stmt->close();
+	if (!is_null($google_id))
+	{
+		$googleAccount = True;
+	}
 }
 else
 {
@@ -146,6 +152,8 @@ if ($stmt = $con->prepare('SELECT id FROM 2fa WHERE id = ?'))
 					</tr>
 				</table><br>
 			<?php
+		if ($googleAccount == False)
+		{
 				if ($twofact == "Not Active")
 				{
 					?>
@@ -188,6 +196,7 @@ if ($stmt = $con->prepare('SELECT id FROM 2fa WHERE id = ?'))
 				</form>
 			<?php
 		}
+	}
 		?>
 			</div>
 		</div>

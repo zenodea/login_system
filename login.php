@@ -1,9 +1,29 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors',1);
 session_start(); // must be before any output
 if (!isset($_SESSION['counter']))
 {
 $_SESSION['counter'] = 0;
 }
+
+require_once './vendor/autoload.php';
+
+$configs = include('config/config.php');
+
+// Creating new google client instance
+$client = new Google_Client();
+
+// Enter your Client ID
+$client->setClientId($configs['client_key_google']);
+// Enter your Client Secrect
+$client->setClientSecret($configs['secret_key_google']);
+// Enter the Redirect URL
+$client->setRedirectUri('http://localhost/ComputerSecurity/login_google.php?');
+
+// Adding those scopes which we want to get (email & profile Information)
+$client->addScope("email");
+$client->addScope("profile");
 
 // Preparing and setting CSRF token
 $token =  bin2hex(random_bytes(32));
@@ -30,7 +50,6 @@ $_SESSION['second_token'] = $second_token;
 					style-src 
 							'self' 
 							https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css 
-							https://use.fontawesome.com/releases/v5.7.1/css/all.css
 							https://fonts.googleapis.com 
 							https://www.google.com/recaptcha/ 
 							https://www.gstatic.com/recaptcha/;
@@ -54,7 +73,7 @@ $_SESSION['second_token'] = $second_token;
 				{
 					foreach($_SESSION['error'] as $key => $value)
 					{
-					echo "<p class='alert alert-danger'>". $value . "</p>"; 
+					echo "<p class='alert alert-danger'>". htmlspecialchars($value) . "</p>"; 
 					}
 				}
 				$_SESSION['error'] = NULL;
@@ -62,13 +81,13 @@ $_SESSION['second_token'] = $second_token;
 				{
 					foreach($_SESSION['success'] as $key => $value)
 					{
-					echo "<p class='alert alert-success'>". $value . "</p>"; 
+					echo "<p class='alert alert-success'>". htmlspecialchars($value) . "</p>"; 
 					}
 				}
 				$_SESSION['success'] = NULL;
 			?>
 			<form  action="authenticate.php"  method="POST" required>
-				<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
+				<input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($token);?>">
 				<input type="hidden" name="token" value="<?php echo htmlspecialchars(hash_hmac('sha256', 'authenticate.php', $_SESSION['second_token']));?>"/>
 				<label for="username">
 					Username
@@ -82,12 +101,15 @@ $_SESSION['second_token'] = $second_token;
 				<div class="g-recaptcha" data-sitekey="6Ldmoj0jAAAAAKYyHaDbjhvncIOSjkFGTxMeT-OG"></div>
 				<input type="submit" value="Login" >
 			</form>
+
+			<a href="<?php echo htmlspecialchars($client->createAuthUrl()); ?>"><button>Log in with Google account</button></a>
+
 			<form action="register.php">
-				<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
+				<input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($token);?>">
 					<input type="submit" value="Register" />
 			</form>
 			<form action="recovery_html.php">
-				<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
+				<input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($token);?>">
 					<input type="submit" value="Forgot Password" />
 			</form>
 	</body>
