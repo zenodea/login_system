@@ -1,6 +1,8 @@
 {
     "require": 
     {
-        "robthree/twofactorauth": "^1.8"
+        "robthree/twofactorauth": "^1.8",
+        "mxrxdxn/pwned-passwords": "^2.1",
+        "google/apiclient": "^2.12"
     }
 }

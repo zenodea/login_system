@@ -1,6 +1,10 @@
 <?php
 session_start();
 
+// Checks if the password has appeared in a leak, via PWNED API
+require_once './vendor/autoload.php';
+$pp = new PwnedPasswords\PwnedPasswords;
+
 // Store information
 $_SESSION['username'] = $_POST['username'];
 $_SESSION['password'] = $_POST['password'];
@@ -84,7 +88,7 @@ $lowercase = preg_match('@[a-z]@', $_SESSION['password']);
 $number    = preg_match('@[0-9]@', $_SESSION['password']);
 $specialChars = preg_match('@[^\w]@', $_SESSION['password']);
 
-if(!$uppercase || !$lowercase || !$number || !$specialChars || strlen($_SESSION['password']) < 8) 
+if($insecure = $pp->isPwned($_SESSION['password']) || !$uppercase || !$lowercase || !$number || !$specialChars || strlen($_SESSION['password']) < 8) 
 {
 	if (!$uppercase)
 	{
@@ -102,9 +106,13 @@ if(!$uppercase || !$lowercase || !$number || !$specialChars || strlen($_SESSION[
 	{
 		array_push($error,"Password has to contain at least one Special Character!");
 	}
-	if (strlen($NEW_PASSWORD) < 8)
+	if (strlen($_SESSION['password']) < 8)
 	{
 		array_push($error,"Password has to longer than 8 characters!");
+	}
+	if ($insecure = $pp->isPwned($_SESSION['password']))
+	{
+		array_push($error,"Password appeared in a leak, use a new one!");
 	}
     session_unset();
 	$_SESSION['error'] = $error;
