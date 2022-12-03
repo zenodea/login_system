@@ -216,7 +216,9 @@ else
         }
 
         //Salt and Hash new password
-        $finalValue = password_hash($finalValue, PASSWORD_DEFAULT);
+        $options = array('cost'=> '15');
+
+        $finalValue = password_hash($finalValue, PASSWORD_BCRYPT, $options);
 
         if ($stmt = $con->prepare('UPDATE accounts SET  pass = ? WHERE id = ?'))
         {

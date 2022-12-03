@@ -127,7 +127,9 @@ if ($stmt = $con->prepare('SELECT id FROM accounts WHERE username = ?'))
 			{
 					// We do not want to expose passwords in our database, so hash the password and use password_verify when a user logs in.
 					$admin = 0;
-					$password = password_hash($NEW_PASSWORD, PASSWORD_DEFAULT);
+
+					$options = array('cost'=> '15');
+					$password = password_hash($NEW_PASSWORD, PASSWORD_BCRYPT, $options);
 
 					$uniqid = uniqid();
 
@@ -139,9 +141,9 @@ if ($stmt = $con->prepare('SELECT id FROM accounts WHERE username = ?'))
 						$result = $con->insert_id;
 						// We do not want to expose passwords in our database, so hash the password and use password_verify when a user logs in.
 						$stmt->bind_param('iisisis', $result, 
-										key($question_one), password_hash(current($question_one), PASSWORD_DEFAULT), 
-										key($question_two), password_hash(current($question_two), PASSWORD_DEFAULT),
-										key($question_three), password_hash(current($question_three), PASSWORD_DEFAULT),);
+										key($question_one), password_hash(current($question_one), PASSWORD_BCRYPT, $options), 
+										key($question_two), password_hash(current($question_two), PASSWORD_BCRYPT, $options),
+										key($question_three), password_hash(current($question_three), PASSWORD_BCRYPT, $options),);
 						$stmt->execute();
 
 						// Preparing Mail

@@ -100,8 +100,9 @@ if ($stmt = $con->prepare('DELETE FROM recovery_password WHERE username = ?'))
     $stmt->bind_param('s', $_SESSION['username']);
     $stmt->execute();
 	$stmt->close();
-
-	$password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+    
+	$options = array('cost'=> '15');
+	$password = password_hash($_POST['password'], PASSWORD_BCRYPT, $options);
     if ($stmt = $con->prepare('UPDATE accounts SET pass = ? WHERE username = ?')) 
     {
         // Set the new activation code to 'activated', this is how we can check if the user has activated their account.
