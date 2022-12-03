@@ -11,6 +11,57 @@ if (!isset($_SESSION['loggedin']))
 	exit;
 }
 
+$calc = hash_hmac('sha256', 'req_eval.php', $_SESSION['second_token']);
+//CSRF token check with per-form token check, also timeout check
+if(isset($_POST) & !empty($_POST))
+{
+	if(isset($_POST['csrf_token']))
+	{
+		if (hash_equals($calc,$_POST['token']))
+		{
+			if(hash_equals($_POST['csrf_token'], $_SESSION['csrf_token']))
+			{
+				// All good, continue...
+			}
+			else
+			{
+				array_push($error,'Token error, try again!');
+				unset($_SESSION['csrf_token_time']);
+				unset($_SESSION['csrf_token']);
+				unset($_SESSION['second_token']);
+				$_SESSION['error'] = $error;
+				header('Location: req_eval_html.php');
+				exit();
+			}
+		}
+		else
+		{
+			array_push($error,'Token error, try again!');
+			unset($_SESSION['csrf_token_time']);
+			unset($_SESSION['csrf_token']);
+			unset($_SESSION['second_token']);
+			$_SESSION['error'] = $error;
+			header('Location: req_eval_html.php');
+			exit();
+		}
+	}
+	$maximum_time = 100;
+	if (isset($_SESSION['csrf_token_time']))
+	{
+		$token_time = $_SESSION['csrf_token_time'];
+		if(($token_time + $maximum_time) <= time())
+		{
+			unset($_SESSION['csrf_token_time']);
+			unset($_SESSION['csrf_token']);
+			unset($_SESSION['second_token']);
+        	array_push($error,'Timeout error, try again!');
+			$_SESSION['error'] = $error;
+			header('Location: req_eval_html.php');
+			exit();
+		}
+	}
+}
+
 //CSRF token check (and time check)
 if(isset($_POST) & !empty($_POST))
 {

@@ -26,6 +26,10 @@ if (mysqli_connect_errno())
 $token =  bin2hex(random_bytes(32));
 $_SESSION['csrf_token'] = $token;
 $_SESSION['csrf_token_time'] = time();
+
+// Per-form csrf token
+$second_token = bin2hex(random_bytes(32));
+$_SESSION['second_token'] = $second_token;
 ?>
 
 <!DOCTYPE html>
@@ -75,7 +79,10 @@ $_SESSION['csrf_token_time'] = time();
 		if (isset($_SESSION["error"]) & !empty($_SESSION["error"])) {echo "<p class='alert alert-danger'>". $_SESSION["error"] . " </p>"; $_SESSION['error'] = NULL;}
 	?>
 	<form action="req_eval.php" method="POST" class="signup-form" enctype="multipart/form-data">
+
 		<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
+		<input type="hidden" name="token" value="<?php echo htmlspecialchars(hash_hmac('sha256', 'req_eval.php', $_SESSION['second_token']))?>"/>
+
 		<label for="topic">Topic</label>
 			<input type="text" id="topic" name="topic"><br><br>
 		<label for="body">Body</label>

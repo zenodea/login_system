@@ -112,16 +112,6 @@ if(!$uppercase || !$lowercase || !$number || !$specialChars || strlen($_SESSION[
 	exit();
 }
 
-#Check Username is valid
-if (preg_match("^[0-9A-Za-z_]+$", $_SESSION['username']) == 0)
-{
-    array_push($error,"Invalid Username!");
-    session_unset();
-    $_SESSION['error'] = $error;
-    header('Location: register.php');
-    exit();
-}
-
 #Check Email is correct
 if (!filter_var($_SESSION['email'], FILTER_VALIDATE_EMAIL)) 
 {

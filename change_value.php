@@ -133,9 +133,22 @@ if ( mysqli_connect_errno() )
 }
 
 
-if ($valueToSelect != "password")
+if ($valueToSelect == "phone")
 {
-    if ($stmt = $con->prepare('UPDATE accounts SET '.$valueToSelect.' = ? WHERE id = ?')) 
+    if ($stmt = $con->prepare('UPDATE accounts SET phone = ? WHERE id = ?')) 
+    {
+            $stmt->bind_param('si',  $finalValue, $_SESSION['id']);
+            $stmt->execute();
+            $correct = array();
+            array_push($correct, "Change succesfully made!");
+            $_SESSION['success'] = $correct;
+            header('Location: profile.php');
+            exit();
+    }
+}
+elseif ($valueToSelect == "email")
+{
+    if ($stmt = $con->prepare('UPDATE accounts SET email = ? WHERE id = ?')) 
     {
             $stmt->bind_param('si',  $finalValue, $_SESSION['id']);
             $stmt->execute();

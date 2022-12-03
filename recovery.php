@@ -54,6 +54,7 @@ if(isset($_POST) & !empty($_POST))
 			array_push($error,'Token error, try again!');
 			session_unset();
 			$_SESSION['error'] = $error;
+			header('Location: recovery_html.php');
 			exit();
 		}
 	}

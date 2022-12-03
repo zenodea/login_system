@@ -14,6 +14,10 @@ $questions = array(
 $token =  bin2hex(random_bytes(32));
 $_SESSION['csrf_token'] = $token;
 $_SESSION['csrf_token_time'] = time();
+
+// Per-form csrf token
+$second_token = bin2hex(random_bytes(32));
+$_SESSION['second_token'] = $second_token;
 ?>
 
 <!DOCTYPE html>
@@ -66,7 +70,10 @@ $_SESSION['csrf_token_time'] = time();
 				$_SESSION['success'] = NULL;
 			?>
 			<form action="register_insertion.php" method="POST" autocomplete="off">
+
 				<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
+				<input type="hidden" name="token" value="<?php echo htmlspecialchars(hash_hmac('sha256', 'register_insertion.php', $_SESSION['second_token']))?>"/>
+
 				<select name="first_question" id="first_question">
 					<option value="">--- select security question ---</option>
 					<?php foreach($questions as $value => $key): ?>
