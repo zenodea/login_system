@@ -114,7 +114,7 @@ if ($stmt = $con->prepare('SELECT id FROM 2fa WHERE id = ?'))
 				{
 					foreach($_SESSION['error'] as $key => $value)
 					{
-						echo "<p class='alert alert-danger'>". $value . "</p>"; 
+						echo "<p class='alert alert-danger'>". htmlspecialchars($value) . "</p>"; 
 					}
 				}
 				$_SESSION['error'] = NULL;
@@ -122,7 +122,7 @@ if ($stmt = $con->prepare('SELECT id FROM 2fa WHERE id = ?'))
 				{
 					foreach($_SESSION['success'] as $key => $value)
 					{
-						echo "<p class='alert alert-success'>". $value . "</p>"; 
+						echo "<p class='alert alert-success'>". htmlspecialchars($value) . "</p>"; 
 					}
 				}
 				$_SESSION['success'] = NULL;

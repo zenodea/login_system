@@ -111,12 +111,12 @@ if ($stmt = $con->prepare('SELECT admin, id, public_key FROM accounts WHERE id =
 	<?php 
 	if (isset($_SESSION['correct']) & !empty($_SESSION['correct']))
 	{
-		echo "<p class='alert alert-success'>". $_SESSION['correct'] . " </p>"; 
+		echo "<p class='alert alert-success'>". htmlspecialchars($_SESSION['correct']) . " </p>"; 
 		$_SESSION['correct'] = NULL;
 	}
 	if (isset($_SESSION["error"]) & !empty($_SESSION["error"])) 
 	{
-		echo "<p class='alert alert-danger'>". $_SESSION["error"] . " </p>"; 
+		echo "<p class='alert alert-danger'>". htmlspecialchars($_SESSION["error"]) . " </p>"; 
 		$_SESSION['error'] = NULL;
 	}
 	?>

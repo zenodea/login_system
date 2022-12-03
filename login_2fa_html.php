@@ -45,7 +45,7 @@ $_SESSION['csrf_token_time'] = time();
 		<div class="login">
 			<h1>Login</h1>
 			<?php 
-			if (isset($_SESSION["error"]) & !empty($_SESSION["error"])) {echo "<p class='alert alert-danger'>". $_SESSION["error"] . " </p>"; $_SESSION['error'] = NULL;}
+			if (isset($_SESSION["error"]) & !empty($_SESSION["error"])) {echo "<p class='alert alert-danger'>". htmlspecialchars($_SESSION["error"]) . " </p>"; $_SESSION['error'] = NULL;}
 			?>
 			<form  action="login_2fa.php"  method="POST" required>
 				<input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($token);?>">

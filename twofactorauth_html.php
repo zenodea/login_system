@@ -72,7 +72,7 @@ $_SESSION['csrf_token_time'] = time();
                 <li>Next, have the user verify the code; at this time the code displayed by a 2FA-app would be: <span style="color:#00c"><?php echo $code; ?></span> (but that changes periodically)</li>
                 <li>When the code checks out, 2FA can be / is enabled; store (encrypted?) secret with user and have the user verify a code each time a new session is started.</li>
                 <li>
-                    When aforementioned code (<?php echo $code; ?>) was entered, the result would be:
+                    When aforementioned code (<?php echo htmlspecialchars($code); ?>) was entered, the result would be:
                     <?php if ($tfa->verifyCode($secret, $code) === true) { ?>
                         <span style="color:#0c0">OK</span>
                     <?php } else { ?>
@@ -80,13 +80,13 @@ $_SESSION['csrf_token_time'] = time();
                     <?php } ?>
                 </li>
             <form action="twofactorauth.php" method="POST">
-				<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
-                <input type=hidden value=<?php echo $secret;?> name="secret" />
+				<input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($token);?>">
+                <input type=hidden value=<?php echo htmlspecialchars($secret);?> name="secret" />
                 <input type="submit" value="Complete (Make sure the app is connected before continuing)" />
             </form>
             <br>
             <form action="profile.php" method="POST">
-				<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
+				<input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($token);?>">
                 <input type="submit" value="Go Back" />
             </form>
         </div>

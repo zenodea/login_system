@@ -144,7 +144,7 @@ $_SESSION['csrf_token_time'] = time();
         <?php 
 			if (isset($_SESSION['correct']) & !empty($_SESSION['correct']))
 			{
-				echo "<p class='alert alert-success'>". $_SESSION['correct'] . " </p>"; $_SESSION['correct'] = NULL;
+				echo "<p class='alert alert-success'>". htmlspecialchars($_SESSION['correct']) . " </p>"; $_SESSION['correct'] = NULL;
 			}
 			if (isset($_SESSION["error"]) & !empty($_SESSION["error"])) 
 			{
@@ -152,12 +152,12 @@ $_SESSION['csrf_token_time'] = time();
 				{
 					foreach($_SESSION['error'] as $key => $values)
 					{
-						echo "<p class='alert alert-danger'>". $values . "</p>"; 
+						echo "<p class='alert alert-danger'>". htmlspecialchars($values) . "</p>"; 
 					}
 				}
 				else
 				{
-					echo "<p class='alert alert-danger'>". $_SESSION["error"] . " </p>"; 
+					echo "<p class='alert alert-danger'>". htmlspecialchars($_SESSION["error"]) . " </p>"; 
 				}
 				$_SESSION['error'] = NULL;
 			}
@@ -166,7 +166,7 @@ $_SESSION['csrf_token_time'] = time();
             <?php
 				if (isset($_SESSION["error"]) & !empty($_SESSION["error"])) 
 				{
-					echo "<p class='alert alert-danger'>". $_SESSION["error"] . " </p>"; 
+					echo "<p class='alert alert-danger'>". htmlspecialchars($_SESSION["error"]) . " </p>"; 
 					$_SESSION['error'] = NULL;
 				}
 			?>

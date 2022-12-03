@@ -55,15 +55,15 @@ $_SESSION['csrf_token_time'] = time();
 		</div>
 	</nav>
 	<?php 
-		if (isset($_SESSION['correct']) & !empty($_SESSION['correct'])){echo "<p class='alert alert-success'>". $_SESSION['correct'] . " </p>"; $_SESSION['correct'] = NULL;}
-		if (isset($_SESSION["error"]) & !empty($_SESSION["error"])) {echo "<p class='alert alert-danger'>". $_SESSION["error"] . " </p>"; $_SESSION['error'] = NULL;}
+		if (isset($_SESSION['correct']) & !empty($_SESSION['correct'])){echo "<p class='alert alert-success'>". htmlspecialchars($_SESSION['correct']) . " </p>"; $_SESSION['correct'] = NULL;}
+		if (isset($_SESSION["error"]) & !empty($_SESSION["error"])) {echo "<p class='alert alert-danger'>". htmlspecialchars($_SESSION["error"]) . " </p>"; $_SESSION['error'] = NULL;}
 	?>
 	<body class="loggedin showimage">
 		<div class="content">
-			<h2>Evaluation: <?php echo $_POST['description'];?> Picture</h2>
-			 <img src=<?php echo $_POST['image']?> class="center"> 
+			<h2>Evaluation: <?php echo htmlspecialchars($_POST['description']);?> Picture</h2>
+			 <img src=<?php echo htmlspecialchars($_POST['image'])?> class="center"> 
 			<form action="list_eval.php" method="POST">
-				<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
+				<input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($token);?>">
 				<input class="button" name="Go Back" value="Go Back" type="submit" id="contact"/>
 			</form>
 		</div>

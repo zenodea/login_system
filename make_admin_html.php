@@ -79,12 +79,12 @@ $_SESSION['csrf_token_time'] = time();
 		</nav>
 		<div class="content">
             <?php
-				if (isset($_SESSION['correct']) & !empty($_SESSION['correct'])){echo "<p class='alert alert-success'>". $_SESSION['correct'] . " </p>"; $_SESSION['correct'] = NULL;}
-				if (isset($_SESSION["error"]) & !empty($_SESSION["error"])) {echo "<p class='alert alert-danger'>". $_SESSION["error"] . " </p>"; $_SESSION['error'] = NULL;}
+				if (isset($_SESSION['correct']) & !empty($_SESSION['correct'])){echo "<p class='alert alert-success'>". htmlspecialchars($_SESSION['correct']) . " </p>"; $_SESSION['correct'] = NULL;}
+				if (isset($_SESSION["error"]) & !empty($_SESSION["error"])) {echo "<p class='alert alert-danger'>". htmlspecialchars($_SESSION["error"]) . " </p>"; $_SESSION['error'] = NULL;}
 			?>
 			<h2>Answer Security Questions To Continue</h2>
 			<form action="make_admin.php" method="POST" autocomplete="off">
-				<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
+				<input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($token);?>">
 				<label>Username of user to make adming</label>
 					<input type="text" name="username" placeholder="Username" id="username" required><br><br>
 				<label>Password of username</label>

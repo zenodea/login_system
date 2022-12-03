@@ -102,7 +102,7 @@ $_SESSION['csrf_token_time'] = time();
 				{
 					foreach($_SESSION['error'] as $key => $value)
 					{
-					echo "<p class='alert alert-danger'>". $value . "</p>"; 
+					echo "<p class='alert alert-danger'>". htmlspecialchars($value) . "</p>"; 
 					}
 				}
 				$_SESSION['error'] = NULL;
@@ -110,13 +110,13 @@ $_SESSION['csrf_token_time'] = time();
 				{
 					foreach($_SESSION['success'] as $key => $value)
 					{
-					echo "<p class='alert alert-success'>". $value . "</p>"; 
+					echo "<p class='alert alert-success'>". htmlspecialchars($value) . "</p>"; 
 					}
 				}
 				$_SESSION['success'] = NULL;
 			?>
 			<form  action="recovery_final.php"  method="POST" required>
-				<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
+				<input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($token);?>">
 
 				<label for="password"> Password </label>
 					<input type="password" name="password" placeholder="New Password" id="password">

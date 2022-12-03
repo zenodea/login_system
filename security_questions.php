@@ -56,7 +56,7 @@ $_SESSION['second_token'] = $second_token;
 				{
 					foreach($_SESSION['error'] as $key => $value)
 					{
-					echo "<p class='alert alert-danger'>". $value . "</p>"; 
+					echo "<p class='alert alert-danger'>". htmlspecialchars($value) . "</p>"; 
 					}
 				}
 				$_SESSION['error'] = NULL;
@@ -64,14 +64,14 @@ $_SESSION['second_token'] = $second_token;
 				{
 					foreach($_SESSION['success'] as $key => $value)
 					{
-					echo "<p class='alert alert-success'>". $value . "</p>"; 
+					echo "<p class='alert alert-success'>". htmlspecialchars($value) . "</p>"; 
 					}
 				}
 				$_SESSION['success'] = NULL;
 			?>
 			<form action="register_insertion.php" method="POST" autocomplete="off">
 
-				<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
+				<input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($token);?>">
 				<input type="hidden" name="token" value="<?php echo htmlspecialchars(hash_hmac('sha256', 'register_insertion.php', $_SESSION['second_token']))?>"/>
 
 				<select name="first_question" id="first_question">
