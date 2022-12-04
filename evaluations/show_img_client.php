@@ -31,11 +31,16 @@ $ciphertext = substr($encrypted, $iv_len, -$tag_length);
 $tag = substr($encrypted, -$tag_length);
 $newFinalContent = openssl_decrypt($ciphertext, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag);
 
-// Creating a temp file with the decrypted picture
-if (file_put_contents('../uploads/temp.png', $newFinalContent))
-{
+// Get extension of image
+$ext = pathinfo($_POST['image'], PATHINFO_EXTENSION);
 
+// Creating a temp file with the decrypted picture
+$new_file_name = '../uploads/'.uniqid().'.'.$ext;
+if (file_put_contents($new_file_name, $newFinalContent))
+{
+	$_SESSION['temp'] = $new_file_name;
 }
+
 else
 {
 	$_SESSION['error'] = $_SESSION['key'];
@@ -95,7 +100,7 @@ $_SESSION['second_token'] = $second_token;
 	<body class="loggedin showimage">
 		<div class="content">
 			<h2>Evaluation: <?php echo htmlspecialchars($_POST['description']);?> Picture</h2>
-			 <img src=<?php echo htmlspecialchars('../uploads/temp.png')?> class="center"> 
+			 <img src=<?php echo htmlspecialchars($new_file_name)?> class="center"> 
 			<form action="list_eval_client.php" method="POST">
 
 				<input type="hidden" name="token" value="<?php echo htmlspecialchars(hash_hmac('sha256', 'list_eval_client.php', $_SESSION['second_token']));?>"/>

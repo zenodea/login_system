@@ -29,10 +29,10 @@ if (mysqli_connect_errno())
     // Creating connection with db
 }
 
-// If a picture has been decrypted, it gets deleted.
-if (file_exists('../uploads/temp.png')) 
+if (!is_null($_SESSION['temp']))
 {
-   unlink('../uploads/temp.png');
+	unlink($_SESSION['temp']);
+	unset($_SESSION['temp']);
 }
 
 $calc = hash_hmac('sha256', 'list_eval_client.php', $_SESSION['second_token']);
