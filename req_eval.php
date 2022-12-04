@@ -201,7 +201,35 @@ if ($stmt = $con->prepare("INSERT INTO evaluations (id_user, header, comment, ur
 	//Encrypting Photo
 	if ($uploadfile != "None")
 	{
+		$contents = file_get_contents($newFileName);
+		$contents_encrytped = openssl_encrypt($contents, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag, "", $tag_length);
+		//Encrypting header 
+		if (file_put_contents($newFileName, $iv.$contents_encrytped.$tag))
+		{
 
+		}
+		else
+		{
+			$_SESSION['error'] = "Errors uploading file, try again!";
+			header('Location: req_eval_html.php');
+			exit();
+		}
+		// header to decrypt
+		$encrypted = file_get_contents($newFileName);
+		$iv = substr($encrypted, 0, $iv_len);
+		$ciphertext = substr($encrypted, $iv_len, -$tag_length);
+		$tag = substr($encrypted, -$tag_length);
+		$newFinalContent = openssl_decrypt($ciphertext, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag);
+		if (file_put_contents("uploads/temp.png", $newFinalContent))
+		{
+
+		}
+		else
+		{
+			$_SESSION['error'] = "Errors uploading file, try again!";
+			header('Location: req_eval_html.php');
+			exit();
+		}
 	}
 	else
 	{

@@ -21,6 +21,12 @@ if (mysqli_connect_errno())
     echo "yikes";
 }
 
+// If the user file in existing directory already exist, delete it
+if (file_exists('uploads/temp.png')) 
+{
+   unlink('uploads/temp.png');
+}
+
 // Prepare statement to check if user is admin
 if ($stmt = $con->prepare('SELECT admin, id, public_key FROM accounts WHERE id = ?'))
 {
@@ -155,6 +161,7 @@ if ($stmt = $con->prepare('SELECT admin, id, public_key FROM accounts WHERE id =
 					// Preparing decryption items
 					$password = $decrypted_curr_cipher;
 					$key = substr(hash('sha256', $password, true), 0, 32);
+					$_SESSION['key'] = $key;
 					$cipher = 'aes-256-gcm';
 					$iv_len = openssl_cipher_iv_length($cipher);
 					$tag_length = 16;
@@ -197,7 +204,6 @@ if ($stmt = $con->prepare('SELECT admin, id, public_key FROM accounts WHERE id =
 						?>
 					<form action="show_image.php" method="POST">
 						<input type="hidden" name="description" value=<?php echo htmlspecialchars($email);?> id="description" hidden>
-						<input type="hidden" name="key" value=<?php echo htmlspecialchars($decrypted_curr_cipher);?> id="what" hidden>
 						<input type="hidden" name="image" value=<?php echo htmlspecialchars($row['url']);?> id="image" hidden>
 						<td><input type="submit" value="See Picture" id="see_pic"></td>
 					</form>

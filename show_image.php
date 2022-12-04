@@ -9,6 +9,30 @@ if (!isset($_SESSION['loggedin']))
 	header('Location: index.html');
 	exit;
 }
+
+// header to decrypt
+// Preparing decryption items
+$key = $_SESSION['key'];
+$cipher = 'aes-256-gcm';
+$iv_len = openssl_cipher_iv_length($cipher);
+$tag_length = 16;
+
+$encrypted = file_get_contents($_POST['image']);
+$iv = substr($encrypted, 0, $iv_len);
+$ciphertext = substr($encrypted, $iv_len, -$tag_length);
+$tag = substr($encrypted, -$tag_length);
+$newFinalContent = openssl_decrypt($ciphertext, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag);
+if (file_put_contents("uploads/temp.png", $newFinalContent))
+{
+
+}
+else
+{
+	$_SESSION['error'] = $_SESSION['key'];
+	header('Location: req_eval_html.php');
+	exit();
+}
+
 // Preparing and setting CSRF token
 $token =  bin2hex(random_bytes(32));
 $_SESSION['csrf_token'] = $token;
@@ -61,7 +85,7 @@ $_SESSION['csrf_token_time'] = time();
 	<body class="loggedin showimage">
 		<div class="content">
 			<h2>Evaluation: <?php echo htmlspecialchars($_POST['description']);?> Picture</h2>
-			 <img src=<?php echo htmlspecialchars($_POST['image'])?> class="center"> 
+			 <img src=<?php echo htmlspecialchars("uploads/temp.png")?> class="center"> 
 			<form action="list_eval.php" method="POST">
 				<input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($token);?>">
 				<input class="button" name="Go Back" value="Go Back" type="submit" id="contact"/>

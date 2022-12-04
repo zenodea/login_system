@@ -104,6 +104,8 @@ $_SESSION['second_token'] = $second_token;
 
 			<a href="<?php echo htmlspecialchars($client->createAuthUrl()); ?>"><button>Log in with Google account</button></a>
 
+			<a id="facebook" href="<?php echo htmlspecialchars($client->createAuthUrl()); ?>"><button>Log in with Google account</button></a>
+
 			<form action="register.php">
 				<input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($token);?>">
 					<input type="submit" value="Register" />
