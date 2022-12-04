@@ -9,25 +9,28 @@ if (!isset($_SESSION['loggedin']))
 	exit;
 }
 
-if($_SERVER["HTTPS"] != "on")
+// Making sure that web url utilises https
+if($_SERVER['HTTPS'] != 'on')
 {
-    header("Location: https://" . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"]);
+    header('Location: https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
     exit();
 }
 
-// Change this to your connection info.
+// Setting up connection information for the db
 $configs = include('../config/config.php');
 $DATABASE_HOST = $configs['host'];
 $DATABASE_USER = $configs['username'];
 $DATABASE_PASS = $configs['db_pass'];
 $DATABASE_NAME = $configs['db_name'];
 
+// Creating connection with db
 $con = mysqli_connect($DATABASE_HOST, $DATABASE_USER, $DATABASE_PASS, $DATABASE_NAME);
 if (mysqli_connect_errno()) 
 {
 	exit('Failed to connect to MySQL: ' . mysqli_connect_error());
 }
 
+// Profile, initially, marked as not google account
 $googleAccount = False;
 
 // We don't have the password or email info stored in sessions so instead we can get the results from the database.
@@ -39,25 +42,15 @@ if ($stmt = $con->prepare('SELECT phone_no, email, admin, google_id FROM account
 	$stmt->bind_result($phone, $email, $admin, $google_id);
 	$stmt->fetch();
 	$stmt->close();
+
+	// If google account, then some options are removed (like changing information of the account)
 	if (!is_null($google_id))
 	{
 		$googleAccount = True;
 	}
 }
-else
-{
 
-}
-
-if ($admin == 0)
-{
-	$admin = "False";
-}
-else
-{
-	$admin = "True";
-}
-
+// Check if user already has 2fa active
 if ($stmt = $con->prepare('SELECT id FROM 2fa WHERE id = ?'))
 {
 	// In this case we can use the account ID to get the account info.
@@ -66,11 +59,11 @@ if ($stmt = $con->prepare('SELECT id FROM 2fa WHERE id = ?'))
 	$stmt->store_result();
 	if ($stmt->num_rows > 0)
 	{
-		$twofact = "Active";
+		$twofact = 'Active';
 	}
 	else
 	{
-		$twofact = "Not Active";
+		$twofact = 'Not Active';
 	}
 }
 ?>
@@ -80,7 +73,7 @@ if ($stmt = $con->prepare('SELECT id FROM 2fa WHERE id = ?'))
 	<head>
 		<meta
 			http-equiv="Content-Security-Policy"
-			content="default-src 'none'; 
+			content="default-src ; 
 					script-src 
 							'self' 
 							https://apis.google.comhttps://apis.google.com 
@@ -95,8 +88,8 @@ if ($stmt = $con->prepare('SELECT id FROM 2fa WHERE id = ?'))
 					form-action 'self';
 					img-src 'self' www.gstatic.com;
 					frame-src 'self' https://www.google.com/recaptcha/;
-					object-src 'self' 'none';
-					base-uri 'self' 'none';" 
+					object-src 'self' ;
+					base-uri 'self' ;" 
   		/>
 		<title>Profile Page</title>
 		<link href="../css/style.css" rel="stylesheet" type="text/css">
@@ -116,7 +109,7 @@ if ($stmt = $con->prepare('SELECT id FROM 2fa WHERE id = ?'))
 		<div class="content">
 			<h2>Profile Page</h2>
 			<?php
-				if (isset($_SESSION["error"]) & !empty($_SESSION["error"])) 
+				if (isset($_SESSION['error']) & !empty($_SESSION['error'])) 
 				{
 					foreach($_SESSION['error'] as $key => $value)
 					{
@@ -160,7 +153,7 @@ if ($stmt = $con->prepare('SELECT id FROM 2fa WHERE id = ?'))
 			<?php
 		if ($googleAccount == False)
 		{
-				if ($twofact == "Not Active")
+				if ($twofact == 'Not Active')
 				{
 					?>
 					<form action="../2fa/2fa_client.php" method="POST">
@@ -193,7 +186,7 @@ if ($stmt = $con->prepare('SELECT id FROM 2fa WHERE id = ?'))
 			<input type="submit" value="Change Phone" />
 		</form>
 		<?php
-		if ($admin == "True")
+		if ($admin == 1)
 		{
 			?>
 				<form action="make_admin_html.php" method="POST">

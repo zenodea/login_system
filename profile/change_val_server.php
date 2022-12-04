@@ -8,7 +8,7 @@ $question_one =  $_POST['first_answer'];
 $question_two =  $_POST['second_answer'];
 $question_three = $_POST['third_answer'];
 
-// Change this to your connection info.
+// Preparing connection information for the db
 $configs = include('../config/config.php');
 $DATABASE_HOST = $configs['host'];
 $DATABASE_USER = $configs['username'];
@@ -21,24 +21,37 @@ if (!isset($_SESSION['loggedin'])) {
 	exit;
 }
 
-//CSRF token check (and time check)
+$calc = hash_hmac('sha256', 'change_val_server.php', $_SESSION['second_token']);
+//CSRF token check with per-form token check, also timeout check
 if(isset($_POST) & !empty($_POST))
 {
 	if(isset($_POST['csrf_token']))
 	{
-		if($_POST['csrf_token'] == $_SESSION['csrf_token'])
+		if (hash_equals($calc,$_POST['token']))
 		{
+			if(hash_equals($_POST['csrf_token'], $_SESSION['csrf_token']))
+			{
+				// All good, continue...
+			}
+			else
+			{
+				array_push($error,'Token error, try again!');
+				session_unset();
+				$_SESSION['error'] = $error;
+				header('Location: profile_client.php');
+				exit();
+			}
 		}
 		else
 		{
-			unset($_SESSION['csrf_token_time']);
-			unset($_SESSION['csrf_token']);
-			$_SESSION['error'] = "CSRF token error, try again!";
-			header('Location: change_val_client.php');
+			array_push($error,'Token error, try again!');
+			session_unset();
+			$_SESSION['error'] = $error;
+			header('Location: profile_client.php');
 			exit();
 		}
 	}
-	$maximum_time = 600;
+	$maximum_time = 100;
 	if (isset($_SESSION['csrf_token_time']))
 	{
 		$token_time = $_SESSION['csrf_token_time'];
@@ -46,14 +59,15 @@ if(isset($_POST) & !empty($_POST))
 		{
 			unset($_SESSION['csrf_token_time']);
 			unset($_SESSION['csrf_token']);
-			$_SESSION['error'] = 'Token Expired, try again!';
-			header('Location: change_val_client.php');
+        	array_push($error,'Timeout error, try again!');
+			session_unset();
+			$_SESSION['error'] = $error;
+			header('Location: profile_client.php');
 			exit();
 		}
 	}
 }
-
-// Try and connect using the info above.
+// Creating connection with db
 $con = mysqli_connect($DATABASE_HOST, $DATABASE_USER, $DATABASE_PASS, $DATABASE_NAME);
 if ( mysqli_connect_errno() ) 
 {

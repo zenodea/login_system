@@ -3,13 +3,13 @@ session_start(); // must be before any output
 
 if (!isset($_SESSION['counter']))
 {
-$_SESSION['counter'] = 0;
+	$_SESSION['counter'] = 0;
 }
 
-
-if($_SERVER["HTTPS"] != "on")
+// Make sure web url utilises https
+if($_SERVER['HTTPS'] != 'on')
 {
-    header("Location: https://" . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"]);
+    header('Location: https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
     exit();
 }
 
@@ -40,8 +40,8 @@ $_SESSION['csrf_token_time'] = time();
 					form-action 'self';
 					img-src 'self' www.gstatic.com;
 					frame-src 'self' https://www.google.com/recaptcha/;
-					object-src 'self' 'none';
-					base-uri 'self' 'none';" 
+					object-src 'self' ;
+					base-uri 'self' ;" 
   		/>
 		<title>Login</title>
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
@@ -52,7 +52,7 @@ $_SESSION['csrf_token_time'] = time();
 		<div class="login">
 			<h1>Login</h1>
 			<?php 
-			if (isset($_SESSION["error"]) & !empty($_SESSION["error"])) {echo "<p class='alert alert-danger'>". htmlspecialchars($_SESSION["error"]) . " </p>"; $_SESSION['error'] = NULL;}
+			if (isset($_SESSION['error']) & !empty($_SESSION['error'])) {echo "<p class='alert alert-danger'>". htmlspecialchars($_SESSION['error']) . " </p>"; $_SESSION['error'] = NULL;}
 			?>
 			<form  action="login_2fa_server.php"  method="POST" required>
 				<input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($token);?>">

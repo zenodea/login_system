@@ -2,17 +2,21 @@
 error_reporting(E_ALL);
 ini_set('display_errors',1);
 session_start(); // must be before any output
+
+// Setting up the counter for the number of attempts
 if (!isset($_SESSION['counter']))
 {
 $_SESSION['counter'] = 0;
 }
 
-if($_SERVER["HTTPS"] != "on")
+// Make sure web url utilises https
+if($_SERVER['HTTPS'] != 'on')
 {
-    header("Location: https://" . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"]);
+    header('Location: https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
     exit();
 }
 
+// Used for google API
 require_once '../vendor/autoload.php';
 
 $configs = include('../config/config.php');
@@ -25,11 +29,11 @@ $client->setClientId($configs['client_key_google']);
 // Enter your Client Secrect
 $client->setClientSecret($configs['secret_key_google']);
 // Enter the Redirect URL
-$client->setRedirectUri('http://localhost/ComputerSecurity/login_google.php?');
+$client->setRedirectUri('http://localhost/ComputerSecurity/google/login_google_server.php?');
 
 // Adding those scopes which we want to get (email & profile Information)
-$client->addScope("email");
-$client->addScope("profile");
+$client->addScope('email');
+$client->addScope('profile');
 
 // Preparing and setting CSRF token
 $token =  bin2hex(random_bytes(32));
@@ -62,8 +66,8 @@ $_SESSION['second_token'] = $second_token;
 					form-action 'self';
 					img-src 'self' www.gstatic.com;
 					frame-src 'self' https://www.google.com/recaptcha/;
-					object-src 'self' 'none';
-					base-uri 'self' 'none';" 
+					object-src 'self' ;
+					base-uri 'self' ;" 
   		/>
 		<title>Login</title>
 		<link rel="stylesheet" href='https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css'>
@@ -75,7 +79,7 @@ $_SESSION['second_token'] = $second_token;
 		<div class="login">
 			<h1>Login</h1>
 			<?php
-				if (isset($_SESSION["error"]) & !empty($_SESSION["error"])) 
+				if (isset($_SESSION['error']) & !empty($_SESSION['error'])) 
 				{
 					foreach($_SESSION['error'] as $key => $value)
 					{

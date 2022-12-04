@@ -15,6 +15,10 @@ use RobThree\Auth\TwoFactorAuth;
 $token =  bin2hex(random_bytes(32));
 $_SESSION['csrf_token'] = $token;
 $_SESSION['csrf_token_time'] = time();
+
+// Per-form csrf token
+$second_token = bin2hex(random_bytes(32));
+$_SESSION['second_token'] = $second_token;
 ?>
 <!doctype html>
 <html>
@@ -36,13 +40,12 @@ $_SESSION['csrf_token_time'] = time();
 					form-action 'self';
 					img-src 'self' www.gstatic.com data:;
 					frame-src 'self' https://www.google.com/recaptcha/;
-					object-src 'self' 'none';
-					base-uri 'self' 'none';" 
+					object-src 'self' ;
+					base-uri 'self' ;" 
   		/>
 		<title>Activate Two Factor Authentication</title>
 		<link href="../css/style.css" rel="stylesheet" type="text/css">
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
 	</head>
 	<body class="loggedin fa">
 		<nav class="navtop">
@@ -87,7 +90,10 @@ $_SESSION['csrf_token_time'] = time();
                     <?php } ?>
                 </li>
             <form action="2fa_activate_server.php" method="POST">
+
 				<input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($token);?>">
+		        <input type="hidden" name="token" value="<?php echo htmlspecialchars(hash_hmac('sha256', '2fa_activate_server.php', $_SESSION['second_token']))?>"/>
+
                 <input type=hidden value=<?php echo htmlspecialchars($secret);?> name="secret" />
                 <input type="submit" value="Complete (Make sure the app is connected before continuing)" />
             </form>

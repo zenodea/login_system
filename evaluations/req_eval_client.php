@@ -1,32 +1,34 @@
 <?php
 session_start(); // must be before any output
 
-if($_SERVER["HTTPS"] != "on")
+// Force user to load with https
+if($_SERVER['HTTPS'] != 'on')
 {
-    header("Location: https://" . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"]);
+    header('Location: https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
     exit();
 }
 
-
+// Check that the user is loggedin
 if (!isset($_SESSION['loggedin'])) 
 {
 	header('Location: ../index.html');
 	exit;
 }
 
-// Change this to your connection info.
+// Preparing connection information for the db
 $configs = include('../config/config.php');
 $DATABASE_HOST = $configs['host'];
 $DATABASE_USER = $configs['username'];
 $DATABASE_PASS = $configs['db_pass'];
 $DATABASE_NAME = $configs['db_name'];
 
+// Connect to database
 $con = mysqli_connect($DATABASE_HOST, $DATABASE_USER, $DATABASE_PASS, $DATABASE_NAME);
 if (mysqli_connect_errno()) 
 {
 	// If there is an error with the connection, stop the script and display the error.
 	exit('Failed to connect to MySQL: ' . mysqli_connect_error());
-	echo "yikes";
+	// Creating connection with db
 }
  
 // Preparing and setting CSRF token
@@ -44,7 +46,7 @@ $_SESSION['second_token'] = $second_token;
 	<head>
 		<meta
 			http-equiv="Content-Security-Policy"
-			content="default-src 'none'; 
+			content="default-src ; 
 					script-src 
 							'self' 
 							https://apis.google.comhttps://apis.google.com 
@@ -59,14 +61,14 @@ $_SESSION['second_token'] = $second_token;
 					form-action 'self';
 					img-src 'self' www.gstatic.com;
 					frame-src 'self' https://www.google.com/recaptcha/;
-					object-src 'self' 'none';
-					base-uri 'self' 'none';" 
+					object-src 'self' ;
+					base-uri 'self' ;" 
   		/>
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 		<title>Request Evalutation Page</title>
 		<link href="../css/style.css" rel="stylesheet" type="text/css">
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
-		<script src='https://www.google.com/recaptcha/api.js' async defer></script>
+		<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 	</head>
 	<nav class="navtop">
 		<div>
@@ -83,7 +85,7 @@ $_SESSION['second_token'] = $second_token;
 	<div>
 	<?php 
 		if (isset($_SESSION['correct']) & !empty($_SESSION['correct'])){echo "<p class='alert alert-success'>". htmlspecialchars($_SESSION['correct']) . " </p>"; $_SESSION['correct'] = NULL;}
-		if (isset($_SESSION["error"]) & !empty($_SESSION["error"])) {echo "<p class='alert alert-danger'>". htmlspecialchars($_SESSION["error"]) . " </p>"; $_SESSION['error'] = NULL;}
+		if (isset($_SESSION['error']) & !empty($_SESSION['error'])) {echo "<p class='alert alert-danger'>". htmlspecialchars($_SESSION['error']) . " </p>"; $_SESSION['error'] = NULL;}
 	?>
 	<form action="req_eval_server.php" method="POST" class="signup-form" enctype="multipart/form-data">
 
@@ -101,7 +103,7 @@ $_SESSION['second_token'] = $second_token;
 		<select name="contact">
 			<?php
 				// Get all the categories from category table
-				$sql = "SELECT * FROM `accounts` where id=".$_SESSION['id'];
+				$sql = 'SELECT * FROM accounts where id='.$_SESSION['id'];
 				$all_categories = mysqli_query($con,$sql);
 				// use a while loop to fetch data
 				// from the $all_categories variable

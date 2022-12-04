@@ -3,20 +3,20 @@ error_reporting(E_ALL);
 ini_set('display_errors',1);
 session_start();
 
-if($_SERVER["HTTPS"] != "on")
+if($_SERVER['HTTPS'] != 'on')
 {
-    header("Location: https://" . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"]);
+    header('Location: https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
     exit();
 }
 
-// Change this to your connection info.
+// Preparing connection information for the db
 $configs = include('../config/config.php');
 $DATABASE_HOST = $configs['host'];
 $DATABASE_USER = $configs['username'];
 $DATABASE_PASS = $configs['db_pass'];
 $DATABASE_NAME = $configs['db_name'];
 
-// Try and connect using the info above.
+// Creating connection with db
 $con = mysqli_connect($DATABASE_HOST, $DATABASE_USER, $DATABASE_PASS, $DATABASE_NAME);
 if (mysqli_connect_errno()) 
 {
@@ -36,7 +36,7 @@ if (isset($_GET['username'], $_GET['code']))
         {
             $stmt->bind_result($expiration_date);
             $stmt->fetch();
-            if (time() > strtotime("+5 hours", strtotime($expiration_date)))
+            if (time() > strtotime('+5 hours', strtotime($expiration_date)))
             {
                 if ($stmt = $con->prepare('DELETE FROM recovery_password WHERE username = ?'))
                 {
@@ -70,6 +70,10 @@ if (isset($_GET['username'], $_GET['code']))
 $token = md5(uniqid(rand(), true));
 $_SESSION['csrf_token'] = $token;
 $_SESSION['csrf_token_time'] = time();
+
+// Per-form csrf token
+$second_token = bin2hex(random_bytes(32));
+$_SESSION['second_token'] = $second_token;
 ?>
 
 <!DOCTYPE html>
@@ -77,7 +81,7 @@ $_SESSION['csrf_token_time'] = time();
 	<head>
 		<meta
 			http-equiv="Content-Security-Policy"
-			content="default-src 'none'; 
+			content="default-src ; 
 					script-src 
 							'self' 
 							https://apis.google.comhttps://apis.google.com 
@@ -92,8 +96,8 @@ $_SESSION['csrf_token_time'] = time();
 					form-action 'self';
 					img-src 'self' www.gstatic.com;
 					frame-src 'self' https://www.google.com/recaptcha/;
-					object-src 'self' 'none';
-					base-uri 'self' 'none';" 
+					object-src 'self' ;
+					base-uri 'self' ;" 
   		/>
 		<title>Recovery Password</title>
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
@@ -123,6 +127,7 @@ $_SESSION['csrf_token_time'] = time();
 			?>
 			<form  action="recovery_accepted_server.php"  method="POST" required>
 				<input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($token);?>">
+				<input type="hidden" name="token" value="<?php echo htmlspecialchars(hash_hmac('sha256', 'recovery_accepted_server.php', $_SESSION['second_token']));?>"/>
 
 				<label for="password"> Password </label>
 					<input type="password" name="password" placeholder="New Password" id="password">

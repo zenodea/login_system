@@ -1,19 +1,19 @@
 <?php
 session_start(); // must be before any output
   
-if($_SERVER["HTTPS"] != "on")
+if($_SERVER['HTTPS'] != 'on')
 {
-    header("Location: https://" . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"]);
+    header('Location: https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
     exit();
 }
 
 // Preparing array containing security questions
 $questions = array(
-    1 => "What city were you born in?",
-    2 => "What is your oldest sibling’s middle name?",
-    3 => "What was the first concert you attended?",
-    4 => "What was the make and model of your first car?",
-    5 => "In what city or town did your parents meet?",
+    1 => 'What city were you born in?',
+    2 => 'What is your oldest sibling’s middle name?',
+    3 => 'What was the first concert you attended?',
+    4 => 'What was the make and model of your first car?',
+    5 => 'In what city or town did your parents meet?',
 );
 
 // Preparing and setting CSRF token
@@ -31,7 +31,7 @@ $_SESSION['second_token'] = $second_token;
 	<head>
 		<meta
 			http-equiv="Content-Security-Policy"
-			content="default-src 'none'; 
+			content="default-src ; 
 					script-src 
 							'self' 
 							https://apis.google.comhttps://apis.google.com 
@@ -46,11 +46,10 @@ $_SESSION['second_token'] = $second_token;
 					form-action 'self';
 					img-src 'self' www.gstatic.com;
 					frame-src 'self' https://www.google.com/recaptcha/;
-					object-src 'self' 'none';
-					base-uri 'self' 'none';" 
+					object-src 'self' ;
+					base-uri 'self' ;" 
   		/>
 		<title>Register</title>
-		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 		<link href="../css/style.css" rel="stylesheet" type="text/css">
 	</head>
@@ -58,7 +57,7 @@ $_SESSION['second_token'] = $second_token;
 		<div class="security_questions login">
 			<h1>Security Questions</h1>
 			<?php
-				if (isset($_SESSION["error"]) & !empty($_SESSION["error"])) 
+				if (isset($_SESSION['error']) & !empty($_SESSION['error'])) 
 				{
 					foreach($_SESSION['error'] as $key => $value)
 					{

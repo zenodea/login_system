@@ -3,14 +3,14 @@ error_reporting(E_ALL);
 ini_set('display_errors',1);
 session_start();
 
-// Change this to your connection info.
+// Preparing connection information for the db
 $configs = include('../config/config.php');
 $DATABASE_HOST = $configs['host'];
 $DATABASE_USER = $configs['username'];
 $DATABASE_PASS = $configs['db_pass'];
 $DATABASE_NAME = $configs['db_name'];
 
-// Try and connect using the info above.
+// Creating connection with db
 $con = mysqli_connect($DATABASE_HOST, $DATABASE_USER, $DATABASE_PASS, $DATABASE_NAME);
 if (mysqli_connect_errno()) 
 {
@@ -18,6 +18,7 @@ if (mysqli_connect_errno())
 	exit('Failed to connect to MySQL: ' . mysqli_connect_error());
 }
 
+// SQL query to delte 2fa from id of user
 if ($stmt = $con->prepare('DELETE FROM 2fa WHERE id = ?'))
 {
 	// In this case we can use the account ID to get the account info.

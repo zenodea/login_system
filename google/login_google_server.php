@@ -3,9 +3,10 @@ error_reporting(E_ALL);
 ini_set('display_errors',1);
 session_start();
 
+// Needed for google API
 require_once '../vendor/autoload.php';
 
-// Change this to your connection info.
+// Preparing connection information for the db
 $configs = include('../config/config.php');
 $DATABASE_HOST = $configs['host'];
 $DATABASE_USER = $configs['username'];
@@ -33,29 +34,33 @@ $client->setRedirectUri('http://localhost/ComputerSecurity/google/login_google_s
 $client->addScope("email");
 $client->addScope("profile");
 
+// If code is obtained 
 if(isset($_GET['code']))
 {
+    // Confirm auth code
     $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
 
     if(!isset($token["error"]))
     {
         $client->setAccessToken($token['access_token']);
+
         // getting profile information
         $google_oauth = new Google_Service_Oauth2($client);
         $google_account_info = $google_oauth->userinfo->get();
+
         // Storing data into database
         $id = $google_account_info->id;
         $full_name = trim($google_account_info->name);
         $email = $google_account_info->email;
-        $phone = $google_account_info->phone;
-        echo $id."<br>";
-        echo $full_name."<br>";
-        echo $email."<br>";
+
+        // Check if the google_id exists in the database
         if ($stmt = $con->prepare('SELECT id, username FROM accounts WHERE google_id = ?'))
         {
             $stmt->bind_param('s', $id);
             $stmt->execute();
             $stmt->store_result();
+
+            // If yes, log the user in with the right information
             if ($stmt->num_rows > 0) 
             {
                 $stmt->bind_result($id_account, $username);
@@ -66,13 +71,15 @@ if(isset($_GET['code']))
                 header('Location: ../profile/profile_client.php');
                 exit;
             }
+
+            // If not, create an account with the google account credentials
             else 
             {
                 if ($stmt = $con->prepare('INSERT INTO accounts(google_id, username, email, admin, activation_code)
                                           VALUES (?, ?, ?, ?, ?)'))
                 {
                     $admin = 0;
-                    $activation_code = "activated";
+                    $activation_code = 'activated';
                     $stmt->bind_param('sssis', $id, $full_name, $email, $admin, $activation_code);
                     $stmt->execute();
                     $error = array();

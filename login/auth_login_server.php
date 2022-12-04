@@ -13,32 +13,18 @@ if(isset($_POST['g-recaptcha-response']))
 {
   $captcha=$_POST['g-recaptcha-response'];
 }
-$secretKey = "6Ldmoj0jAAAAAIWrcfVRMYAb-C19UvaDA3Me_069";
+$secretKey = '6Ldmoj0jAAAAAIWrcfVRMYAb-C19UvaDA3Me_069';
 $url = 'https://www.google.com/recaptcha/api/siteverify?secret=' . urlencode($secretKey) .  '&response=' . urlencode($captcha);
 $response = file_get_contents($url);
 $responseKeys = json_decode($response,true);
-if($responseKeys["success"]) 
+if($responseKeys['success']) 
 {
 }
 else
 {
-	array_push($error, "Please complete capcha!");
+	array_push($error, 'Please complete capcha!');
 	$_SESSION['error'] = $error;
 	header('Location: login_client.php');
-	exit();
-}
-
-//Check if username or password have been set
-if (isset($_POST) & !empty($_POST))
-{
-	if(empty($_POST['username'])) { $_SESSION['usernameError'] = "Insert Username";$empty = TRUE; }
-	if(empty($_POST['password'])) { $_SESSION['passwordError'] = "Insert Password"; $empty = TRUE; }
-}
-
-if ($empty == TRUE)
-{
-	header('Location: login_client.php');
-	session_unset();
 	exit();
 }
 
@@ -89,16 +75,14 @@ if(isset($_POST) & !empty($_POST))
 	}
 }
 
-// Change this to your connection info.
+// Preparing connection information for the db
 $configs = include('../config/config.php');
 $DATABASE_HOST = $configs['host'];
 $DATABASE_USER = $configs['username'];
 $DATABASE_PASS = $configs['db_pass'];
 $DATABASE_NAME = $configs['db_name'];
 
-
-
-// Try and connect using the info above.
+// Creating connection with db
 $con = mysqli_connect($DATABASE_HOST, $DATABASE_USER, $DATABASE_PASS, $DATABASE_NAME);
 if ( mysqli_connect_errno() ) 
 {
@@ -109,32 +93,41 @@ if ( mysqli_connect_errno() )
 //Check if three attempts have been made
 if ($stmt = $con->prepare('SELECT * FROM ip WHERE address = ?'))
 {
-	$stmt->bind_param('s', $_SERVER["REMOTE_ADDR"]);
+	$stmt->bind_param('s', $_SERVER['REMOTE_ADDR']);
 	$stmt->execute();
+
 	// Store the result so we can check if the account exists in the database.
 	$stmt->store_result();
+
+	// If ip is in the table, check time since insertion
 	if ($stmt->num_rows > 0)
 	{
-		$ip = $_SERVER["REMOTE_ADDR"];
+		$ip = $_SERVER['REMOTE_ADDR'];
+
+		// Check if 10 minutes passed from 'timestamp'
 		$result = mysqli_query($con, "SELECT * FROM `ip` WHERE `address` = '$ip' AND `timestamp`  + INTERVAL 10 MINUTE < NOW()");
 		if ($result->num_rows > 0)
 		{
 			mysqli_query($con, "DELETE FROM `ip` WHERE `address` = '$ip'");
 			$_SESSION['counter'] = 0;
-			array_push($error, "You may try again!");
-			$_SESSION["error"] = $error;	
+			array_push($error, 'You may try again!');
+			$_SESSION['error'] = $error;	
 			header('Location: login_client.php');
 			exit();
 		}
+
+		// If 10 minutes have not passed, go back to login screen
 		else
 		{
 			$_SESSION['counter'] = 0;
-			array_push($error, "Please wait before trying again!");
-			$_SESSION["error"] = $error;	
+			array_push($error, 'Please wait before trying again!');
+			$_SESSION['error'] = $error;	
 			header('Location: login_client.php');
 			exit();
 		}
 	}
+	
+	// If ip not in table, add ip address to table (alongside timestamp)
 	else
 	{
 		if ($_SESSION['counter'] == 4)
@@ -173,9 +166,11 @@ if ($stmt = $con->prepare('SELECT id, pass, activation_code, admin FROM accounts
 	if ($stmt->num_rows > 0) {
 		$stmt->bind_result($id, $password, $authentication_code, $admin);
 		$stmt->fetch();
+
 		// Account exists, now we verify the password.
 		// Note: remember to use password_hash in your registration file to store the hashed passwords.
-		if (password_verify($_POST['password'], $password)) {
+		if (password_verify($_POST['password'], $password)) 
+		{
 			if ($authentication_code == 'activated')
 			{
 				if ($stmt = $con->prepare('SELECT * FROM 2fa WHERE id = ?'))
@@ -211,6 +206,8 @@ if ($stmt = $con->prepare('SELECT id, pass, activation_code, admin FROM accounts
 					}
 				}
 			} 
+			
+			// Account has not been activated yet
 			else 
 			{
 				array_push($error,'Activate Account First');
@@ -220,20 +217,21 @@ if ($stmt = $con->prepare('SELECT id, pass, activation_code, admin FROM accounts
 				exit();
 			}
 	}
+
+	// If wrong password
 	else
 	{
 		array_push($error,'Password is wrong, try again!');
-		session_unset();
 		$_SESSION['error'] = $error;
 		header('Location: login_client.php');
 		exit();
 	}
 	} 
+
+	// Incorrect username
 	else 
 	{
-		// Incorrect username
 		array_push($error,'Password is wrong, try again!');
-		session_unset();
 		$_SESSION['error'] = $error;
 		header('Location: login_client.php');
 		exit();

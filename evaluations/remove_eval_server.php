@@ -3,20 +3,61 @@ error_reporting(E_ALL);
 ini_set('display_errors',1);
 session_start();
 
-if (!isset($_SESSION['loggedin'])) 
-{
-	header('Location: ../index.html');
-	exit;
-}
-
-// Change this to your connection info.
+// Preparing connection information for the db
 $configs = include('../config/config.php');
 $DATABASE_HOST = $configs['host'];
 $DATABASE_USER = $configs['username'];
 $DATABASE_PASS = $configs['db_pass'];
 $DATABASE_NAME = $configs['db_name'];
 
-// Try and connect using the info above.
+$calc = hash_hmac('sha256', 'remove_eval_server.php', $_SESSION['second_token']);
+//CSRF token check with per-form token check, also timeout check
+if(isset($_POST) & !empty($_POST))
+{
+	if(isset($_POST['csrf_token']))
+	{
+		if (hash_equals($calc,$_POST['token']))
+		{
+			if(hash_equals($_POST['csrf_token'], $_SESSION['csrf_token']))
+			{
+				// All good, continue...
+			}
+			else
+			{
+				array_push($error,'Token error, try again!');
+				session_unset();
+				$_SESSION['error'] = $error;
+				header('Location: login_client.php');
+				exit();
+			}
+		}
+		else
+		{
+			array_push($error,'Token error, try again!');
+			session_unset();
+			$_SESSION['error'] = $error;
+			header('Location: login_client.php');
+			exit();
+		}
+	}
+	$maximum_time = 100;
+	if (isset($_SESSION['csrf_token_time']))
+	{
+		$token_time = $_SESSION['csrf_token_time'];
+		if(($token_time + $maximum_time) <= time())
+		{
+			unset($_SESSION['csrf_token_time']);
+			unset($_SESSION['csrf_token']);
+        	array_push($error,'Timeout error, try again!');
+			session_unset();
+			$_SESSION['error'] = $error;
+			header('Location: login_client.php');
+			exit();
+		}
+	}
+}
+
+// Creating connection with db
 $con = mysqli_connect($DATABASE_HOST, $DATABASE_USER, $DATABASE_PASS, $DATABASE_NAME);
 if (mysqli_connect_errno()) 
 {
@@ -24,7 +65,7 @@ if (mysqli_connect_errno())
 	exit('Failed to connect to MySQL: ' . mysqli_connect_error());
 }
 
-// Getting
+// Getting url for the picture.
 if ($stmt = $con->prepare('SELECT url FROM evaluations WHERE id = ?'))
 {
     $stmt->bind_param('i',$_POST['remove']);
@@ -34,9 +75,9 @@ if ($stmt = $con->prepare('SELECT url FROM evaluations WHERE id = ?'))
     $stmt->close();
     
     // Checking for errors
-    if (!unlink($result) & $result != "None")
+    if (!unlink($result) & $result != 'none')
     {
-        $_SESSION['error'] = "Resolve Error, image file does not exist!";
+        $_SESSION['error'] = 'Resolve Error, image file does not exist!';
         header('Location: list_eval_client.php');
         exit();
     }
@@ -52,14 +93,14 @@ if ($stmt = $con->prepare('SELECT url FROM evaluations WHERE id = ?'))
                 $stmt->bind_param('i',$_POST['remove']);
                 $stmt->execute();
                 $stmt->close();
-                $_SESSION['correct'] = "Evaluation succesfully resolved!";
+                $_SESSION['correct'] = 'Evaluation succesfully resolved!';
                 header('Location: list_eval_client.php');
                 exit();
             }
         }
         else
         {
-            $_SESSION['error'] = "Resolve Error, unknown error!";
+            $_SESSION['error'] = 'Resolve Error, unknown error!';
             header('Location: list_eval_client.php');
             exit();
         }

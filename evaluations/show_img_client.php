@@ -3,9 +3,10 @@ error_reporting(E_ALL);
 ini_set('display_errors',1);
 session_start();
 
-if($_SERVER["HTTPS"] != "on")
+// Making sure the url utilises https
+if($_SERVER['HTTPS'] != 'on')
 {
-    header("Location: https://" . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"]);
+    header('Location: https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
     exit();
 }
 
@@ -23,12 +24,15 @@ $cipher = 'aes-256-gcm';
 $iv_len = openssl_cipher_iv_length($cipher);
 $tag_length = 16;
 
+// Decrypting the image correlated to the selected evaluation
 $encrypted = file_get_contents($_POST['image']);
 $iv = substr($encrypted, 0, $iv_len);
 $ciphertext = substr($encrypted, $iv_len, -$tag_length);
 $tag = substr($encrypted, -$tag_length);
 $newFinalContent = openssl_decrypt($ciphertext, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag);
-if (file_put_contents("../uploads/temp.png", $newFinalContent))
+
+// Creating a temp file with the decrypted picture
+if (file_put_contents('../uploads/temp.png', $newFinalContent))
 {
 
 }
@@ -43,6 +47,10 @@ else
 $token =  bin2hex(random_bytes(32));
 $_SESSION['csrf_token'] = $token;
 $_SESSION['csrf_token_time'] = time();
+
+// Per-form csrf token
+$second_token = bin2hex(random_bytes(32));
+$_SESSION['second_token'] = $second_token;
 ?>
 
 <!DOCTYPE html>
@@ -66,8 +74,8 @@ $_SESSION['csrf_token_time'] = time();
 					form-action 'self';
 					img-src 'self' www.gstatic.com;
 					frame-src 'self' https://www.google.com/recaptcha/;
-					object-src 'self' 'none';
-					base-uri 'self' 'none';" 
+					object-src 'self' ;
+					base-uri 'self' ;" 
   		/>
 		<title>Profile Page</title>
 		<link href="../css/style.css" rel="stylesheet" type="text/css">
@@ -86,14 +94,17 @@ $_SESSION['csrf_token_time'] = time();
 	</nav>
 	<?php 
 		if (isset($_SESSION['correct']) & !empty($_SESSION['correct'])){echo "<p class='alert alert-success'>". htmlspecialchars($_SESSION['correct']) . " </p>"; $_SESSION['correct'] = NULL;}
-		if (isset($_SESSION["error"]) & !empty($_SESSION["error"])) {echo "<p class='alert alert-danger'>". htmlspecialchars($_SESSION["error"]) . " </p>"; $_SESSION['error'] = NULL;}
+		if (isset($_SESSION['error']) & !empty($_SESSION['error'])) {echo "<p class='alert alert-danger'>". htmlspecialchars($_SESSION['error']) . " </p>"; $_SESSION['error'] = NULL;}
 	?>
 	<body class="loggedin showimage">
 		<div class="content">
 			<h2>Evaluation: <?php echo htmlspecialchars($_POST['description']);?> Picture</h2>
-			 <img src=<?php echo htmlspecialchars("../uploads/temp.png")?> class="center"> 
+			 <img src=<?php echo htmlspecialchars('../uploads/temp.png')?> class="center"> 
 			<form action="list_eval_client.php" method="POST">
+
+				<input type="hidden" name="token" value="<?php echo htmlspecialchars(hash_hmac('sha256', 'list_eval_client.php', $_SESSION['second_token']));?>"/>
 				<input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($token);?>">
+
 				<input class="button" name="Go Back" value="Go Back" type="submit" id="contact"/>
 			</form>
 		</div>

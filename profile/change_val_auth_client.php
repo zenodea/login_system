@@ -10,35 +10,37 @@ if (!isset($_SESSION['loggedin']))
 	exit;
 }
 
+// Making sure the web url utilises https
 if($_SERVER["HTTPS"] != "on")
 {
     header("Location: https://" . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"]);
     exit();
 }
 
+
 // Saving the value wanted to be changed
-if ($_SESSION['change'] == "phone")
+if ($_SESSION['change'] == 'phone')
 {
-    $value = "Phone Number";
+    $value = 'Phone Number';
 }
-elseif ($_SESSION['change'] == "email")
+elseif ($_SESSION['change'] == 'email')
 {
-    $value = "Email";
+    $value = 'Email';
 }
-elseif ($_SESSION['change'] == "password")
+elseif ($_SESSION['change'] == 'password')
 {
-    $value = "Password";
-    $oldValue = "Hidden";
+    $value = 'Password';
+    $oldValue = 'Hidden';
 }
 
-// Change this to your connection info.
+// Preparing connection information for the db
 $configs = include('../config/config.php');
 $DATABASE_HOST = $configs['host'];
 $DATABASE_USER = $configs['username'];
 $DATABASE_PASS = $configs['db_pass'];
 $DATABASE_NAME = $configs['db_name'];
 
-// Try and connect using the info above.
+// Creating connection with db
 $con = mysqli_connect($DATABASE_HOST, $DATABASE_USER, $DATABASE_PASS, $DATABASE_NAME);
 if (mysqli_connect_errno()) 
 {
@@ -68,6 +70,10 @@ if ($stmt = $con->prepare('SELECT email, phone_no FROM accounts WHERE id = ?'))
 $token =  bin2hex(random_bytes(32));
 $_SESSION['csrf_token'] = $token;
 $_SESSION['csrf_token_time'] = time();
+
+// Per-form csrf token
+$second_token = bin2hex(random_bytes(32));
+$_SESSION['second_token'] = $second_token;
 ?>
 
 <!DOCTYPE html>
@@ -75,7 +81,7 @@ $_SESSION['csrf_token_time'] = time();
 	<head>
 		<meta
 			http-equiv="Content-Security-Policy"
-			content="default-src 'none'; 
+			content="default-src ; 
 					script-src 
 							'self' 
 							https://apis.google.comhttps://apis.google.com 
@@ -90,8 +96,8 @@ $_SESSION['csrf_token_time'] = time();
 					form-action 'self';
 					img-src 'self' www.gstatic.com;
 					frame-src 'self' https://www.google.com/recaptcha/;
-					object-src 'self' 'none';
-					base-uri 'self' 'none';" 
+					object-src 'self' ;
+					base-uri 'self' ;" 
   		/>
 		<title>Profile Page</title>
 		<link href="../css/style.css" rel="stylesheet" type="text/css">
@@ -178,7 +184,9 @@ $_SESSION['csrf_token_time'] = time();
 			?>
 			<h2>Answer Security Questions To Continue</h2>
 			<form action="change_val_auth_server.php" method="POST" autocomplete="off">
+
 				<input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($token);?>">
+				<input type="hidden" name="token" value="<?php echo htmlspecialchars(hash_hmac('sha256', 'change_val_auth_server.php', $_SESSION['second_token']));?>"/>
 
 				<label><?php echo "Old " . htmlspecialchars($value);?></label>
 					<input type="text" name="oldValue" value=<?php echo $oldValue;?> id="Old Value" disabled="disabled"><br><br>

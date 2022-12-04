@@ -57,7 +57,7 @@ if(isset($_POST) & !empty($_POST))
 	}
 }
 
-// Change this to your connection info.
+// Preparing connection information for the db
 $configs = include('../config/config.php');
 $DATABASE_HOST = $configs['host'];
 $DATABASE_USER = $configs['username'];

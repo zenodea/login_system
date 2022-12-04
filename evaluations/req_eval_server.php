@@ -3,8 +3,7 @@ error_reporting(E_ALL);
 ini_set('display_errors',1);
 session_start();
 
-define('FILE_ENCRYPTION_BLOCKS', 4000);
-
+// make sure user is logged in
 if (!isset($_SESSION['loggedin'])) 
 {
 	header('Location: ../index.html');
@@ -67,12 +66,12 @@ if(isset($_POST['g-recaptcha-response']))
 {
   $captcha=$_POST['g-recaptcha-response'];
 }
-$secretKey = "6Ldmoj0jAAAAAIWrcfVRMYAb-C19UvaDA3Me_069";
+$secretKey = '6Ldmoj0jAAAAAIWrcfVRMYAb-C19UvaDA3Me_069';
 $url = 'https://www.google.com/recaptcha/api/siteverify?secret=' . urlencode($secretKey) .  '&response=' . urlencode($captcha);
 $response = file_get_contents($url);
 $responseKeys = json_decode($response,true);
 // should return JSON with success as true
-if($responseKeys["success"]) 
+if($responseKeys['success']) 
 {
 }
 else
@@ -82,14 +81,14 @@ else
 	exit();
 }
 
-// Change this to your connection info.
+// Preparing connection information for the db
 $configs = include('../config/config.php');
 $DATABASE_HOST = $configs['host'];
 $DATABASE_USER = $configs['username'];
 $DATABASE_PASS = $configs['db_pass'];
 $DATABASE_NAME = $configs['db_name'];
 
-// Try and connect using the info above.
+// Creating connection with db
 $con = mysqli_connect($DATABASE_HOST, $DATABASE_USER, $DATABASE_PASS, $DATABASE_NAME);
 if (mysqli_connect_errno()) 
 {
@@ -97,35 +96,28 @@ if (mysqli_connect_errno())
 	exit('Failed to connect to MySQL: ' . mysqli_connect_error());
 }
 
+// Make sure that a file has been uploaded
 if (!empty($_FILES['userfile']['name'])) 
 {
 	//Prepare file upload information
 	$allowed = array('png', 'jpg');
 	$filename = $_FILES['userfile']['name'];
 	$ext = pathinfo($filename, PATHINFO_EXTENSION);
-	$uploaddir = "../uploads/";
+	$uploaddir = '../uploads/';
 	$uploadfile = $uploaddir . basename($_FILES['userfile']['name']);
 
 	//Check file type
 	if (!in_array($ext, $allowed)) 
 	{
-		$_SESSION['error'] = "Wrong File Format (Please use png or jpg)!";
-		header('Location: req_eval_client.php');
-		exit();
-	}
-
-	// Check if file already exists
-	if (file_exists($uploadfile)) 
-	{
-		$_SESSION['error'] = "File already exists!";
+		$_SESSION['error'] = 'Wrong File Format (Please use png or jpg)!';
 		header('Location: req_eval_client.php');
 		exit();
 	}
 
 	// Check file size
-	if ($_FILES["userfile"]["size"] > 500000) 
+	if ($_FILES['userfile']['size'] > 500000) 
 	{
-		$_SESSION['error'] = "Upload failed, file size to large!";
+		$_SESSION['error'] = 'Upload failed, file size to large!';
 		header('Location: req_eval_client.php');
 		exit();
 	}
@@ -133,20 +125,20 @@ if (!empty($_FILES['userfile']['name']))
 	// Move File
 	if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) 
 	{
-		$_SESSION['correct'] = "The file ". htmlspecialchars(basename( $_FILES["userfile"]["name"])). " has been uploaded.";
-		$newFileName = $uploaddir.uniqid().".".$ext;
+		$_SESSION['correct'] = 'The file '. htmlspecialchars(basename( $_FILES['userfile']['name'])). 'has been uploaded.';
+		$newFileName = $uploaddir.uniqid().'.'.$ext;
 		rename($uploadfile, $newFileName);
 	}
 	else 
 	{
-		$_SESSION['error'] = $_FILES['userfile']['tmp_name'];
+		$_SESSION['error'] = 'Error in uploading the file, try again!';
 		header('Location: req_eval_client.php');
 		exit();
 	}
 }
 else
 {
-	$uploadfile = "None";
+	$uploadfile = 'none';
 }
 
 // Preparing variabels
@@ -164,10 +156,11 @@ $tag_length = 16;
 $iv = openssl_random_pseudo_bytes($iv_len);
 $tag = ""; // will be filled by openssl_encrypt
 
+// Begin insertion of evaluation into the database
 if ($stmt = $con->prepare("INSERT INTO evaluations (id_user, header, comment, url, contact) VALUES (?, ?, ?, ?, ?)")) 
 {
 	//Encrypting Photo
-	if ($uploadfile != "None")
+	if ($uploadfile != 'none')
 	{
 		$contents = file_get_contents($newFileName);
 		$contents_encrytped = openssl_encrypt($contents, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag, "", $tag_length);
@@ -182,26 +175,10 @@ if ($stmt = $con->prepare("INSERT INTO evaluations (id_user, header, comment, ur
 			header('Location: req_eval_client.php');
 			exit();
 		}
-		// header to decrypt
-		$encrypted = file_get_contents($newFileName);
-		$iv = substr($encrypted, 0, $iv_len);
-		$ciphertext = substr($encrypted, $iv_len, -$tag_length);
-		$tag = substr($encrypted, -$tag_length);
-		$newFinalContent = openssl_decrypt($ciphertext, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag);
-		if (file_put_contents("../uploads/temp.png", $newFinalContent))
-		{
-
-		}
-		else
-		{
-			$_SESSION['error'] = "Errors uploading file, try again!";
-			header('Location: req_eval_client.php');
-			exit();
-		}
 	}
 	else
 	{
-		$newFileName = "None";
+		$newFileName = 'none';
 	}
 	
 	//Encrypting header 
@@ -216,7 +193,12 @@ if ($stmt = $con->prepare("INSERT INTO evaluations (id_user, header, comment, ur
 	$contact_encrypt = openssl_encrypt($contact, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag, "", $tag_length);
 	$contact_encrypt = base64_encode($iv.$contact_encrypt.$tag);
 
-	$stmt->bind_param('sssss', $id, $header_encrypt, $body_encrypt, $newFileName, $contact_encrypt);
+	//Encrypting url 
+	$url_encrypt = openssl_encrypt($newFileName, $cipher, $key, OPENSSL_RAW_DATA, $iv, $tag, "", $tag_length);
+	$url_encrypt = base64_encode($iv.$url_encrypt.$tag);
+
+	// Inserting the encrypted information
+	$stmt->bind_param('sssss', $id, $header_encrypt, $body_encrypt, $url_encrypt, $contact_encrypt);
 	$stmt->execute();
 	$evaluation_id = $con->insert_id;
 	$stmt->close();
@@ -248,10 +230,10 @@ if ($stmt = $con->prepare("INSERT INTO evaluations (id_user, header, comment, ur
 	} 
 	else 
 	{
-		echo "0 results";
+		echo '0 results';
 	}
 } 
-$_SESSION['correct'] = "Evaluation succesfully uploaded!";
+$_SESSION['correct'] = 'Evaluation succesfully uploaded!';
 header('Location: req_eval_client.php');
 exit();
 

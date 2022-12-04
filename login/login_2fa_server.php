@@ -2,17 +2,18 @@
 error_reporting(E_ALL);
 ini_set('display_errors',1);
 session_start();
-require_once(__DIR__.'../vendor/autoload.php'); 
-use RobThree\Auth\TwoFactorAuth;
 
-// Change this to your connection info.
+// Used for 2fa 
+require_once(__DIR__.'../vendor/autoload.php'); 
+
+// Preparing connection information for the db
 $configs = include('config/config.php');
 $DATABASE_HOST = $configs['host'];
 $DATABASE_USER = $configs['username'];
 $DATABASE_PASS = $configs['db_pass'];
 $DATABASE_NAME = $configs['db_name'];
 
-// Try and connect using the info above.
+// Creating connection with db
 $con = mysqli_connect($DATABASE_HOST, $DATABASE_USER, $DATABASE_PASS, $DATABASE_NAME);
 if ( mysqli_connect_errno() ) 
 {

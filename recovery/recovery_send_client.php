@@ -1,9 +1,9 @@
 <?php
 session_start(); // must be before any output
 
-if($_SERVER["HTTPS"] != "on")
+if($_SERVER['HTTPS'] != 'on')
 {
-    header("Location: https://" . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"]);
+    header('Location: https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
     exit();
 }
 
@@ -31,18 +31,16 @@ $_SESSION['second_token'] = $second_token;
 					style-src 
 							'self' 
 							https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css 
-							https://use.fontawesome.com/releases/v5.7.1/css/all.css
 							https://fonts.googleapis.com 
 							https://www.google.com/recaptcha/ 
 							https://www.gstatic.com/recaptcha/;
 					form-action 'self';
 					img-src 'self' www.gstatic.com;
 					frame-src 'self' https://www.google.com/recaptcha/;
-					object-src 'self' 'none';
-					base-uri 'self' 'none';" 
+					object-src 'self' ;
+					base-uri 'self' ;" 
   		/>
 		<title>Recovery pssword</title>
-		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 		<link href="../css/style.css" rel="stylesheet" type="text/css">
 		<script src='https://www.google.com/recaptcha/api.js' async defer></script>
@@ -51,7 +49,7 @@ $_SESSION['second_token'] = $second_token;
 		<div class="login">
 			<h1>Recovery</h1>
 			<?php
-				if (isset($_SESSION["error"]) & !empty($_SESSION["error"])) 
+				if (isset($_SESSION['error']) & !empty($_SESSION['error'])) 
 				{
 					foreach($_SESSION['error'] as $key => $value)
 					{

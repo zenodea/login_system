@@ -3,23 +3,37 @@ error_reporting(E_ALL);
 ini_set('display_errors',1);
 session_start();
 
-//CSRF token check (and time check)
+$calc = hash_hmac('sha256', 'recovery_accepted_server.php', $_SESSION['second_token']);
+//CSRF token check with per-form token check, also timeout check
 if(isset($_POST) & !empty($_POST))
 {
 	if(isset($_POST['csrf_token']))
 	{
-		if($_POST['csrf_token'] == $_SESSION['csrf_token'])
+		if (hash_equals($calc,$_POST['token']))
 		{
+			if(hash_equals($_POST['csrf_token'], $_SESSION['csrf_token']))
+			{
+				// All good, continue...
+			}
+			else
+			{
+				array_push($error,'Token error, try again!');
+				session_unset();
+				$_SESSION['error'] = $error;
+				header('Location: recovery_accepted_client.php');
+				exit();
+			}
 		}
 		else
 		{
-			$_SESSION['error'] = 'Token Error, try again!';
+			array_push($error,'Token error, try again!');
 			session_unset();
+			$_SESSION['error'] = $error;
 			header('Location: recovery_accepted_client.php');
 			exit();
 		}
 	}
-	$maximum_time = 600;
+	$maximum_time = 100;
 	if (isset($_SESSION['csrf_token_time']))
 	{
 		$token_time = $_SESSION['csrf_token_time'];
@@ -27,22 +41,23 @@ if(isset($_POST) & !empty($_POST))
 		{
 			unset($_SESSION['csrf_token_time']);
 			unset($_SESSION['csrf_token']);
-			$_SESSION['error'] = 'Token Expired, try again!';
+        	array_push($error,'Timeout error, try again!');
 			session_unset();
+			$_SESSION['error'] = $error;
 			header('Location: recovery_accepted_client.php');
 			exit();
 		}
 	}
 }
 
-// Change this to your connection info.
+// Preparing connection information for the db
 $configs = include('../config/config.php');
 $DATABASE_HOST = $configs['host'];
 $DATABASE_USER = $configs['username'];
 $DATABASE_PASS = $configs['db_pass'];
 $DATABASE_NAME = $configs['db_name'];
 
-// Try and connect using the info above.
+// Creating connection with db
 $con = mysqli_connect($DATABASE_HOST, $DATABASE_USER, $DATABASE_PASS, $DATABASE_NAME);
 if ( mysqli_connect_errno() ) {
 	// If there is an error with the connection, stop the script and display the error.
@@ -101,6 +116,7 @@ if ($stmt = $con->prepare('DELETE FROM recovery_password WHERE username = ?'))
     $stmt->execute();
 	$stmt->close();
     
+	// Hashing the new password with higher cost (slower)
 	$options = array('cost'=> '15');
 	$password = password_hash($_POST['password'], PASSWORD_BCRYPT, $options);
     if ($stmt = $con->prepare('UPDATE accounts SET pass = ? WHERE username = ?')) 
@@ -110,14 +126,6 @@ if ($stmt = $con->prepare('DELETE FROM recovery_password WHERE username = ?'))
         $stmt->execute();
 		$stmt->close();
 
-		if ($stmt = $con->prepare('SELECT admin, id FROM accounts WHERE username = ?'))
-		{
-			$stmt->bind_param('s', $_SESSION['username']);
-			$stmt->execute();
-			$stmt->bind_result($admin, $id);
-			$stmt->fetch();
-			$stmt->close();
-		}
         session_unset();
         $success = array();
         array_push($success, 'Password Succesfully Changed!');

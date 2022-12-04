@@ -7,9 +7,10 @@ if (!isset($_SESSION['loggedin'])) {
 	exit;
 }
 
-if($_SERVER["HTTPS"] != "on")
+// Make sure web url utilises https
+if($_SERVER['HTTPS'] != 'on')
 {
-    header("Location: https://" . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"]);
+    header('Location: https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
     exit();
 }
 
@@ -18,21 +19,21 @@ $_SESSION['change'] = $_POST['value'];
 
 //Storing the security questions
 $questions = array(
-    1 => "What city were you born in?",
-    2 => "What is your oldest sibling’s middle name?",
-    3 => "What was the first concert you attended?",
-    4 => "What was the make and model of your first car?",
-    5 => "In what city or town did your parents meet?",
+    1 => 'What city were you born in?',
+    2 => 'What is your oldest sibling’s middle name?',
+    3 => 'What was the first concert you attended?',
+    4 => 'What was the make and model of your first car?',
+    5 => 'In what city or town did your parents meet?',
 );
 
-// Change this to your connection info.
+// Preparing connection information for the db
 $configs = include('../config/config.php');
 $DATABASE_HOST = $configs['host'];
 $DATABASE_USER = $configs['username'];
 $DATABASE_PASS = $configs['db_pass'];
 $DATABASE_NAME = $configs['db_name'];
 
-// Try and connect using the info above.
+// Creating connection with db
 $con = mysqli_connect($DATABASE_HOST, $DATABASE_USER, $DATABASE_PASS, $DATABASE_NAME);
 if ( mysqli_connect_errno() ) 
 {
@@ -55,6 +56,10 @@ if ($stmt = $con->prepare('SELECT id_one, id_two, id_three FROM security_questio
 $token =  bin2hex(random_bytes(32));
 $_SESSION['csrf_token'] = $token;
 $_SESSION['csrf_token_time'] = time();
+
+// Per-form csrf token
+$second_token = bin2hex(random_bytes(32));
+$_SESSION['second_token'] = $second_token;
 ?>
 
 <!DOCTYPE html>
@@ -62,7 +67,7 @@ $_SESSION['csrf_token_time'] = time();
 	<head>
 		<meta
 			http-equiv="Content-Security-Policy"
-			content="default-src 'none'; 
+			content="default-src ; 
 					script-src 
 							'self' 
 							https://apis.google.comhttps://apis.google.com 
@@ -77,8 +82,8 @@ $_SESSION['csrf_token_time'] = time();
 					form-action 'self';
 					img-src 'self' www.gstatic.com;
 					frame-src 'self' https://www.google.com/recaptcha/;
-					object-src 'self' 'none';
-					base-uri 'self' 'none';" 
+					object-src 'self' ;
+					base-uri 'self' ;" 
   		/>
 
 		<title>Profile Page</title>
@@ -99,11 +104,13 @@ $_SESSION['csrf_token_time'] = time();
 		<div class="content">
             <?php
 				if (isset($_SESSION['correct']) & !empty($_SESSION['correct'])){echo "<p class='alert alert-success'>". htmlspecialchars($_SESSION['correct']) . " </p>"; $_SESSION['correct'] = NULL;}
-				if (isset($_SESSION["error"]) & !empty($_SESSION["error"])) {echo "<p class='alert alert-danger'>". htmlspecialchars($_SESSION["error"]) . " </p>"; $_SESSION['error'] = NULL;}
+				if (isset($_SESSION['error']) & !empty($_SESSION['error'])) {echo "<p class='alert alert-danger'>". htmlspecialchars($_SESSION['error']) . " </p>"; $_SESSION['error'] = NULL;}
 			?>
 			<h2>Answer Security Questions To Continue</h2>
 			<form action="change_val_server.php" method="POST" autocomplete="off">
+
 				<input type="hidden" name="csrf_token" value="<?php echo $token;?>">
+				<input type="hidden" name="token" value="<?php echo htmlspecialchars(hash_hmac('sha256', 'change_val_server.php', $_SESSION['second_token']));?>"/>
 				
 				<label for=<?php echo $questions[$one] ?>><?php echo htmlspecialchars($questions[$one]) ?></label>
 					<input type="text" name="first_answer" placeholder="Answer" id="first_answer" required><br><br>
