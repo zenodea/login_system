@@ -7,6 +7,12 @@ if (!isset($_SESSION['loggedin']))
 	exit;
 }
 
+if($_SERVER["HTTPS"] != "on")
+{
+    header("Location: https://" . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"]);
+    exit();
+}
+
 // Change this to your connection info.
 $configs = include('config/config.php');
 $DATABASE_HOST = $configs['host'];

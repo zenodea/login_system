@@ -7,6 +7,12 @@ if (!isset($_SESSION['counter']))
 $_SESSION['counter'] = 0;
 }
 
+if($_SERVER["HTTPS"] != "on")
+{
+    header("Location: https://" . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"]);
+    exit();
+}
+
 require_once './vendor/autoload.php';
 
 $configs = include('config/config.php');
@@ -104,7 +110,6 @@ $_SESSION['second_token'] = $second_token;
 
 			<a href="<?php echo htmlspecialchars($client->createAuthUrl()); ?>"><button>Log in with Google account</button></a>
 
-			<a id="facebook" href="<?php echo htmlspecialchars($client->createAuthUrl()); ?>"><button>Log in with Google account</button></a>
 
 			<form action="register.php">
 				<input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($token);?>">

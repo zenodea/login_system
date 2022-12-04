@@ -1,6 +1,13 @@
 <?php
 session_start(); // must be before any output
 
+if($_SERVER["HTTPS"] != "on")
+{
+    header("Location: https://" . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"]);
+    exit();
+}
+
+
 if (!isset($_SESSION['loggedin'])) 
 {
 	header('Location: index.html');

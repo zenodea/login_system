@@ -7,6 +7,12 @@ if (!isset($_SESSION['loggedin'])) {
 	exit;
 }
 
+if($_SERVER["HTTPS"] != "on")
+{
+    header("Location: https://" . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"]);
+    exit();
+}
+
 //Value of the change (password, email, phone)
 $_SESSION['change'] = $_POST['value'];
 

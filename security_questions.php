@@ -1,6 +1,12 @@
 <?php
 session_start(); // must be before any output
   
+if($_SERVER["HTTPS"] != "on")
+{
+    header("Location: https://" . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"]);
+    exit();
+}
+
 // Preparing array containing security questions
 $questions = array(
     1 => "What city were you born in?",

@@ -1,6 +1,12 @@
 <?php
 session_start(); // must be before any output
 
+if($_SERVER["HTTPS"] != "on")
+{
+    header("Location: https://" . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"]);
+    exit();
+}
+
 // Preparing and setting CSRF token
 $token =  bin2hex(random_bytes(32));
 $_SESSION['csrf_token'] = $token;

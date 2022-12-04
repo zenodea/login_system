@@ -10,6 +10,12 @@ if (!isset($_SESSION['loggedin']))
 	exit;
 }
 
+if($_SERVER["HTTPS"] != "on")
+{
+    header("Location: https://" . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"]);
+    exit();
+}
+
 // Saving the value wanted to be changed
 if ($_SESSION['change'] == "phone")
 {

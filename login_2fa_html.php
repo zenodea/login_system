@@ -6,6 +6,13 @@ if (!isset($_SESSION['counter']))
 $_SESSION['counter'] = 0;
 }
 
+
+if($_SERVER["HTTPS"] != "on")
+{
+    header("Location: https://" . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"]);
+    exit();
+}
+
 // Preparing CSRF Token
 $token =  bin2hex(random_bytes(32));
 $_SESSION['csrf_token'] = $token;
