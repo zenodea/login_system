@@ -4,10 +4,10 @@ ini_set('display_errors',1);
 session_start();
 
 // Used for 2fa 
-require_once(__DIR__.'../vendor/autoload.php'); 
+require_once('../vendor/autoload.php'); 
 
 // Preparing connection information for the db
-$configs = include('config/config.php');
+$configs = include('../config/config.php');
 $DATABASE_HOST = $configs['host'];
 $DATABASE_USER = $configs['username'];
 $DATABASE_PASS = $configs['db_pass'];

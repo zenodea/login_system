@@ -131,7 +131,7 @@ if ($stmt = $con->prepare('SELECT id FROM accounts WHERE username = ?'))
 					$options = array('cost'=> '15');
 					$password = password_hash($NEW_PASSWORD, PASSWORD_BCRYPT, $options);
 
-					$uniqid = uniqid();
+					$uniqid =	bin2hex(random_bytes(32));
 
 					$stmt->bind_param('ssssis', $NEW_USERNAME, $password, $NEW_EMAIL, $NEW_PHONE, $admin, $uniqid);
 					$stmt->execute();

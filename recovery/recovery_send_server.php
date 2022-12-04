@@ -117,7 +117,7 @@ if ($stmt = $con->prepare('SELECT email, admin FROM accounts WHERE username = ?'
 			if ($stmt = $con->prepare('INSERT INTO recovery_password VALUES (?, ?, CURRENT_TIMESTAMP)'))
 			{
 				// Creating uniqid(); for recovery code
-				$uniqid = uniqid();
+				$uniqid = bin2hex(random_bytes(32));
 				$stmt->bind_param('ss',$_POST['user'], $uniqid);
 				$stmt->execute();
 				$stmt->close();

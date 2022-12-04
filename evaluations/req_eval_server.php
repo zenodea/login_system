@@ -198,7 +198,15 @@ if ($stmt = $con->prepare("INSERT INTO evaluations (id_user, header, comment, ur
 	$url_encrypt = base64_encode($iv.$url_encrypt.$tag);
 
 	// Inserting the encrypted information
-	$stmt->bind_param('sssss', $id, $header_encrypt, $body_encrypt, $url_encrypt, $contact_encrypt);
+	if ($newFileName == 'none')
+	{
+		$stmt->bind_param('sssss', $id, $header_encrypt, $body_encrypt, $newFileName, $contact_encrypt);
+	}
+	else
+	{
+		$stmt->bind_param('sssss', $id, $header_encrypt, $body_encrypt, $url_encrypt, $contact_encrypt);
+	}
+
 	$stmt->execute();
 	$evaluation_id = $con->insert_id;
 	$stmt->close();

@@ -86,10 +86,6 @@ $_SESSION['second_token'] = $second_token;
     <nav class="navtop">
 		<div>
 			<h1>Love Joy</h1>
-			<a href="../profile/profile_client.php"><i class="fas fa-user-circle"></i>Profile</a>
-			<a href="req_eval_client.php"><i class="fas fa-dragon"></i>Request Evaluation</a>
-			<a href="list_eval_server.php"><i class="fas fa-dragon"></i>View Evaluations</a>
-			<a href="../profile/logout_server.php"><i class="fas fa-sign-out-alt"></i>Logout</a>
 		</div>
 	</nav>
 	<?php 

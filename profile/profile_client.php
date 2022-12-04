@@ -189,7 +189,7 @@ if ($stmt = $con->prepare('SELECT id FROM 2fa WHERE id = ?'))
 		if ($admin == 1)
 		{
 			?>
-				<form action="make_admin_html.php" method="POST">
+				<form action="make_admin_client.php" method="POST">
 					<br>
 					<input type="submit"  value="Make admin"/>
 				</form>

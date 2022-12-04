@@ -2,8 +2,9 @@
 error_reporting(E_ALL);
 ini_set('display_errors',1);
 session_start();
+$error = array();
 
-$calc = hash_hmac('sha256', 'req_eval_server.php', $_SESSION['second_token']);
+$calc = hash_hmac('sha256', '2fa_activate_server.php', $_SESSION['second_token']);
 //CSRF token check with per-form token check, also timeout check
 if(isset($_POST) & !empty($_POST))
 {
@@ -22,7 +23,7 @@ if(isset($_POST) & !empty($_POST))
 				unset($_SESSION['csrf_token']);
 				unset($_SESSION['second_token']);
 				$_SESSION['error'] = $error;
-				header('Location: req_eval_client.php');
+				header('Location: ../profile/profile_client.php');
 				exit();
 			}
 		}
@@ -33,7 +34,7 @@ if(isset($_POST) & !empty($_POST))
 			unset($_SESSION['csrf_token']);
 			unset($_SESSION['second_token']);
 			$_SESSION['error'] = $error;
-			header('Location: req_eval_client.php');
+			header('Location: ../profile/profile_client.php');
 			exit();
 		}
 	}
@@ -48,7 +49,7 @@ if(isset($_POST) & !empty($_POST))
 			unset($_SESSION['second_token']);
         	array_push($error,'Timeout error, try again!');
 			$_SESSION['error'] = $error;
-			header('Location: req_eval_client.php');
+			header('Location: ../profile/profile_client.php');
 			exit();
 		}
 	}

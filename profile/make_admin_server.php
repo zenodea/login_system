@@ -92,7 +92,7 @@ if ($stmt = $con->prepare('SELECT id, pass, admin, google_id FROM accounts WHERE
         }
 
 		// Check if user is a google user
-		if (is_null($google_id))
+		if (!is_null($google_id))
         {
             $_SESSION['error'] = 'User is a google user!';	
             header('Location: make_admin_client.php');
@@ -209,13 +209,13 @@ if ($stmt = $con->prepare('INSERT INTO admin_key VALUES (?, ?)'))
 						$stmt->bind_param('iis', $row['id_evaluation'], $id, $encrypted_photo_key);
 						$stmt->execute();
 						$stmt->close();
-						$_SESSION['correct'] = 'Username succesfully made into admin!';	
-						header('Location: make_admin_client.php');
-						exit();
 					}
 				}
 			}
         }
     }
 }
+$_SESSION['correct'] = 'Username succesfully made into admin!';	
+header('Location: make_admin_client.php');
+exit();
 ?>

@@ -67,7 +67,7 @@ if (isset($_GET['username'], $_GET['code']))
 }
 
 // Preparing and Setting CSRF Token 
-$token = md5(uniqid(rand(), true));
+$token =  bin2hex(random_bytes(32));
 $_SESSION['csrf_token'] = $token;
 $_SESSION['csrf_token_time'] = time();
 

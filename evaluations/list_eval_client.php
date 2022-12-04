@@ -228,6 +228,7 @@ $_SESSION['second_token'] = $second_token;
 							exit();
 						}
 					}
+
 					// Preparing decryption items
 					$password = $decrypted_curr_cipher;
 					$key = substr(hash('sha256', $password, true), 0, 32);
