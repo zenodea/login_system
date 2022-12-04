@@ -142,7 +142,16 @@ if ($stmt = $con->prepare('SELECT id FROM 2fa WHERE id = ?'))
 					</tr>
 					<tr>
 						<td>Admin:</td>
-						<td><?=htmlspecialchars($admin)?></td>
+						<td><?php
+						if ($admin == 1)
+						{
+							echo htmlspecialchars("True");
+						}
+						else
+						{
+							echo htmlspecialchars("False");
+						}
+						?></td>
 					</tr>
 					<tr>
 						<td>2 Factor Authentication:</td>
