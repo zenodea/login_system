@@ -7,8 +7,8 @@ return array(
     'db_name' => 'id19760169_lovejoyantiquedb',
     'secret_key_google' => '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',
     'client_key_google' => '1046164658963-ir0os1kp09qd3801t2hv8ciluq0esrg9.apps.googleusercontent.com',
-    'secret_captcha_key_google' => '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',
-    'public_captcha_key_google' => '1046164658963-ir0os1kp09qd3801t2hv8ciluq0esrg9.apps.googleusercontent.com'
+    'secret_captcha_key_google' => '6Ldmoj0jAAAAAIWrcfVRMYAb-C19UvaDA3Me_069',
+    'public_captcha_key_google' => '6Ldmoj0jAAAAAKYyHaDbjhvncIOSjkFGTxMeT-OG'
 );
 
 ?>

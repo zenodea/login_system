@@ -1,6 +1,9 @@
 <?php
 session_start(); // must be before any output
 
+// Configs used for google captcha credentials
+$configs = include('../config/config.php');
+
 // Making sure web url includes https
 if($_SERVER['HTTPS'] != 'on')
 {
@@ -88,7 +91,7 @@ $_SESSION['second_token'] = $second_token;
 				</label>
 				<input type="password" name="password" placeholder="Password" id="password" required>
 				<br>
-				<div class="g-recaptcha" data-sitekey="6Ldmoj0jAAAAAKYyHaDbjhvncIOSjkFGTxMeT-OG"></div>
+				<div class="g-recaptcha" data-sitekey="<?php echo $configs['public_captcha_key_google']?>"></div>
 				<input type="submit" value="Register">
 		</form>
 		<form action="../login/login_client.php">

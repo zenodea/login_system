@@ -94,7 +94,6 @@ if ($stmt = $con->prepare('SELECT id FROM 2fa WHERE id = ?'))
 		<title>Profile Page</title>
 		<link href="../css/style.css" rel="stylesheet" type="text/css">
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
 	</head>
 	<body class="loggedin">
 		<nav class="navtop">

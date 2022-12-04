@@ -3,15 +3,19 @@ error_reporting(E_ALL);
 ini_set('display_errors',1);
 session_start();
 
+
 // Preparing error array
 $error = array();
+
+// Configs used for google captcha credentials, and db credentials
+$configs = include('../config/config.php');
 
 //Captcha Checker
 if(isset($_POST['g-recaptcha-response']))
 {
   $captcha=$_POST['g-recaptcha-response'];
 }
-$secretKey = "6Ldmoj0jAAAAAIWrcfVRMYAb-C19UvaDA3Me_069";
+$secretKey = $configs['secret_captcha_key_google'];
 $url = 'https://www.google.com/recaptcha/api/siteverify?secret=' . urlencode($secretKey) .  '&response=' . urlencode($captcha);
 $response = file_get_contents($url);
 $responseKeys = json_decode($response,true);
@@ -76,7 +80,6 @@ if(isset($_POST) & !empty($_POST))
 }
 
 // Preparing connection information for the db
-$configs = include('../config/config.php');
 $DATABASE_HOST = $configs['host'];
 $DATABASE_USER = $configs['username'];
 $DATABASE_PASS = $configs['db_pass'];

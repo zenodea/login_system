@@ -7,6 +7,9 @@ if($_SERVER['HTTPS'] != 'on')
     exit();
 }
 
+// Configs used for google captcha credentials
+$configs = include('../config/config.php');
+
 // Preparing and setting CSRF token
 $token =  bin2hex(random_bytes(32));
 $_SESSION['csrf_token'] = $token;
@@ -75,7 +78,7 @@ $_SESSION['second_token'] = $second_token;
 					 Username 
 				</i> </label>
 					<input type="text" name="user" placeholder="user" id="user" required>
-				<div class="g-recaptcha" data-sitekey="6Ldmoj0jAAAAAKYyHaDbjhvncIOSjkFGTxMeT-OG"></div>
+				<div class="g-recaptcha" data-sitekey="<?php echo $configs['public_captcha_key_google']?>"></div>
 				<input type="submit" value="Submit Password Recovery Request">
 			</form>
 			<form action="../register/register_client.php">

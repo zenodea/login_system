@@ -123,7 +123,7 @@ $_SESSION['second_token'] = $second_token;
 	</select>
 	<input type="submit" value="Submit">
 	<div class="text-center">
-	<div class="g-recaptcha" data-sitekey="6Ldmoj0jAAAAAKYyHaDbjhvncIOSjkFGTxMeT-OG"></div>
+	<div class="g-recaptcha" data-sitekey="<?php echo $configs['public_captcha_key_google']?>"></div>
 	</div>
 	</form>
 	</div>

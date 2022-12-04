@@ -7,6 +7,9 @@ require_once '../vendor/autoload.php';
 // Creating Pwned Checker
 $pp = new PwnedPasswords\PwnedPasswords;
 
+// Configs used for google captcha credentials
+$configs = include('../config/config.php');
+
 // Store information
 $_SESSION['username'] = $_POST['username'];
 $_SESSION['password'] = $_POST['password'];
@@ -68,7 +71,7 @@ if(isset($_POST['g-recaptcha-response']))
 {
   $captcha=$_POST['g-recaptcha-response'];
 }
-$secretKey = '6Ldmoj0jAAAAAIWrcfVRMYAb-C19UvaDA3Me_069';
+$secretKey = $configs['secret_captcha_key_google'];
 $url = 'https://www.google.com/recaptcha/api/siteverify?secret=' . urlencode($secretKey) .  '&response=' . urlencode($captcha);
 $response = file_get_contents($url);
 $responseKeys = json_decode($response,true);

@@ -108,7 +108,7 @@ $_SESSION['second_token'] = $second_token;
 				</label>
 				<input type="password" name="password" placeholder="Password" id="password">
 				<br>
-				<div class="g-recaptcha" data-sitekey="6Ldmoj0jAAAAAKYyHaDbjhvncIOSjkFGTxMeT-OG"></div>
+				<div class="g-recaptcha" data-sitekey="<?php echo $configs['public_captcha_key_google']?>"></div>
 				<input type="submit" value="Login" >
 			</form>
 
