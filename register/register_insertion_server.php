@@ -123,7 +123,7 @@ if ($stmt = $con->prepare('SELECT id FROM accounts WHERE username = ?'))
 		else
 		{
 			// Username doesnt exists, insert new account
-			if ($stmt = $con->prepare('INSERT INTO accounts (username, pass, email, phone_no, admin, activation_code) VALUES (?, ?, ?, ?, ?, ?)')) 
+			if ($stmt = $con->prepare('INSERT INTO accounts (username, pass, email, phone_no, admin, activation_code, date_of_creation) VALUES (?, ?, ?, ?, ?, ?, now())')) 
 			{
 					// We do not want to expose passwords in our database, so hash the password and use password_verify when a user logs in.
 					$admin = 0;
