@@ -1,8 +1,34 @@
 {
-    "require": 
-    {
+    "name": "secureauth/login-system",
+    "description": "A comprehensive PHP-based authentication system with advanced security features including two-factor authentication, secure password recovery, and admin evaluation management.",
+    "type": "project",
+    "keywords": ["php", "authentication", "security", "2fa", "login", "mysql"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Development Team",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=7.4",
         "robthree/twofactorauth": "^1.8",
         "mxrxdxn/pwned-passwords": "^2.1",
         "google/apiclient": "^2.12"
-    }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "SecureAuth\\": "src/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "prefer-stable": true,
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
 }

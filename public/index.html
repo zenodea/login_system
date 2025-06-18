@@ -2,25 +2,24 @@
 <html>
 	<head>
 		<meta charset="utf-8">
-		<title>Login</title>
+		<title>SecureAuth - Login</title>
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
 		<link href="css/style.css" rel="stylesheet" type="text/css">
 		<meta
 			http-equiv="Content-Security-Policy"
-			content="default-src ; script-src 'self'; connect-src 'self'; img-src 'self'; style-src 'self';base-uri 'self';form-action 'self';" 
+			content="default-src 'self'; script-src 'self'; connect-src 'self'; img-src 'self'; style-src 'self'; base-uri 'self'; form-action 'self';" 
   		/>
 	</head>
 	<body>
-		
 		<div class="login">
-		<h1>Lovejoy</h1>
-		<form action="login/login_client.php">
+		<h1>SecureAuth</h1>
+		<form action="../src/auth/login_client.php">
 			<input type="submit" value="Login" />
 		</form>
-		<form action="register/register_client.php">
+		<form action="../src/auth/register_client.php">
 			<input type="submit" value="Register" />
 		</form>
-		<form action="recovery/recovery_send_client.php">
+		<form action="../src/auth/recovery_send_client.php">
 			<input type="submit" value="Forgot Password" />
 		</form>
 	</body>

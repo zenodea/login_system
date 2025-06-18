@@ -1,2 +1,39 @@
-composer.phar 
+# Dependencies
 /vendor/
+composer.phar
+
+# Configuration files
+includes/config.php
+.env
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Cache and temporary files
+cache/
+temp/
+tmp/
+
+# Upload directories
+uploads/
+images/temp/
+
+# Session files
+sessions/
