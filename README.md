@@ -42,22 +42,6 @@ A comprehensive PHP-based authentication system with advanced security features 
 - Password strength validation against common password lists
 - Secure password reset functionality
 
-## Project Structure
-
-```
-├── public/              # Web-accessible files
-│   ├── index.html      # Main entry point
-│   └── css/            # Stylesheets
-├── src/                # Application source code
-│   ├── auth/           # Authentication modules
-│   ├── user/           # User management
-│   ├── admin/          # Admin functionality
-│   └── api/            # API endpoints
-├── includes/           # Configuration files
-│   └── config.php      # Main configuration
-└── vendor/             # Composer dependencies
-```
-
 ## Installation
 
 1. Clone the repository
@@ -124,19 +108,3 @@ A comprehensive PHP-based authentication system with advanced security features 
 - `composer.json` - PHP dependencies and autoloading
 - `public/index.html` - Main entry point
 - `includes/10k-most-common.txt` - Common password list for validation
-
-## License
-
-This project is licensed under the MIT License.
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
-
-## Support
-
-For support and questions, use the evaluation system within the application or contact the development team.
